@@ -1,10 +1,17 @@
 """DenseNet121 transfer-learning model construction and fine-tuning helpers."""
 from __future__ import annotations
 
+import urllib.error
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.applications import DenseNet121
-from tensorflow.keras.layers import BatchNormalization, Dense, Dropout, GlobalAveragePooling2D, Input
+from tensorflow.keras.layers import (
+    BatchNormalization,
+    Dense,
+    Dropout,
+    GlobalAveragePooling2D,
+    Input,
+)
 from tensorflow.keras.optimizers import Adam
 
 from src.config import (
@@ -15,14 +22,31 @@ from src.config import (
 )
 
 
-def build_densenet121_model() -> tuple[Model, Model]:
-    """Build the primary four-class DenseNet121 transfer-learning model."""
+def build_densenet121_model(weights: str | None = "imagenet") -> tuple[Model, Model]:
+    """Build the primary four-class DenseNet121 transfer-learning model.
+    
+    Raises a clear RuntimeError if ImageNet weights fail to download.
+    Never silently falls back to random weights.
+    """
     inputs = Input(shape=INPUT_SHAPE, name="mri_input")
-    backbone = DenseNet121(
-        weights="imagenet",
-        include_top=False,
-        input_shape=INPUT_SHAPE,
-    )
+    try:
+        backbone = DenseNet121(
+            weights=weights,
+            include_top=False,
+            input_shape=INPUT_SHAPE,
+        )
+    except (urllib.error.URLError, ConnectionError, OSError, TimeoutError) as exc:
+        raise RuntimeError(
+            f"Failed to download ImageNet weights for DenseNet121: {exc}\n"
+            "An active internet connection is required on the first run to download the pretrained weights "
+            "from Keras storage (~30 MB). Transfer learning cannot proceed without pretrained weights. "
+            "Please check your network connection and retry."
+        ) from exc
+    except Exception as exc:
+        raise RuntimeError(
+            f"Unable to construct DenseNet121 backbone with weights='{weights}': {exc}"
+        ) from exc
+
     backbone.trainable = False
 
     x = backbone(inputs, training=False)
@@ -52,10 +76,21 @@ def compile_model(model: Model, learning_rate: float = INITIAL_LEARNING_RATE) ->
 
 
 def find_backbone(model: Model) -> Model:
-    """Find the nested DenseNet121 backbone in a saved model."""
+    """Find the nested DenseNet121 backbone in a model or loaded checkpoint."""
+    # 1. Direct layer search
     for layer in model.layers:
         if isinstance(layer, Model) and "densenet" in layer.name.lower():
             return layer
+
+    # 2. Check for any Functional/Model layer that has conv layers
+    for layer in model.layers:
+        if isinstance(layer, Model) and any("conv" in sub.name.lower() for sub in layer.layers):
+            return layer
+
+    # 3. Check if the model itself is the backbone
+    if any("conv" in layer.name.lower() for layer in model.layers):
+        return model
+
     raise ValueError("DenseNet121 backbone could not be found in the model.")
 
 

@@ -6,8 +6,14 @@ from pathlib import Path
 import sys
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-if str(ROOT_DIR) not in sys.path:
-    sys.path.insert(0, str(ROOT_DIR))
+ROOT_STR = str(ROOT_DIR)
+
+# Ensure the project root has priority over the app/ directory.
+# This prevents app/app.py from shadowing the app package.
+if ROOT_STR in sys.path:
+    sys.path.remove(ROOT_STR)
+
+sys.path.insert(0, ROOT_STR)
 
 import pandas as pd
 import plotly.express as px
@@ -112,8 +118,8 @@ def render_analysis() -> None:
 
     if not MODEL_PATH.is_file():
         st.warning(
-            "No trained DenseNet model was found at `models/best_densenet121.keras`. "
-            "Add the dataset and run `python -m src.train` before using MRI prediction."
+            "No trained model is available. Train the DenseNet121 model first.\n\n"
+            "Run: `python -m src.train`"
         )
         render_disclaimer()
         return

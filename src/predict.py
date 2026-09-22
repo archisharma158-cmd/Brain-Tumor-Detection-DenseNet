@@ -12,17 +12,18 @@ from src.config import CLASS_NAMES, DISPLAY_NAMES, MODEL_PATH
 from src.preprocessing import ImageSource, image_to_model_batch
 
 
-def load_trained_model(model_path: Path = MODEL_PATH) -> tf.keras.Model:
+def load_trained_model(model_path: Path | str = MODEL_PATH) -> tf.keras.Model:
     """Load the trained model or provide an actionable error."""
-    if not model_path.is_file():
+    path = Path(model_path)
+    if not path.is_file():
         raise FileNotFoundError(
-            f"No trained DenseNet model was found at {model_path}. "
-            "Train it using `python -m src.train` before using MRI prediction."
+            f"No trained DenseNet model was found at '{path}'. "
+            "Train it using `python -m src.train` before running MRI prediction."
         )
     try:
-        return tf.keras.models.load_model(model_path)
+        return tf.keras.models.load_model(path)
     except Exception as exc:
-        raise RuntimeError(f"The trained model could not be loaded: {exc}") from exc
+        raise RuntimeError(f"The trained model could not be loaded from '{path}': {exc}") from exc
 
 
 def predict_with_model(source: ImageSource, model: Any) -> dict:
@@ -51,22 +52,23 @@ def predict_with_model(source: ImageSource, model: Any) -> dict:
     }
 
 
-def predict_image(source: ImageSource, model_path: Path = MODEL_PATH) -> dict:
+def predict_image(source: ImageSource, model_path: Path | str = MODEL_PATH) -> dict:
     """Load the trained model and predict one MRI image."""
     model = load_trained_model(model_path)
     return predict_with_model(source, model)
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Classify one brain MRI image.")
+    parser = argparse.ArgumentParser(description="Classify one brain MRI image using DenseNet121.")
     parser.add_argument("image", type=Path, help="Path to a JPG/JPEG/PNG MRI image")
+    parser.add_argument("--model-path", type=Path, default=MODEL_PATH, help="Path to trained .keras model")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     try:
-        result = predict_image(args.image)
+        result = predict_image(args.image, model_path=args.model_path)
     except (FileNotFoundError, RuntimeError, ValueError) as exc:
         raise SystemExit(f"Prediction stopped: {exc}") from exc
 

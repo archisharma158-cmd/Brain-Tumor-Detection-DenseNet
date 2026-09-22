@@ -11,6 +11,7 @@ import numpy as np
 import tensorflow as tf
 
 from src.config import (
+    BATCH_SIZE,
     FINE_TUNE_EPOCHS,
     FINE_TUNE_LAYERS,
     INITIAL_EPOCHS,
@@ -21,6 +22,7 @@ from src.config import (
     STAGE2_MODEL_PATH,
     TRAINING_HISTORY_PATH,
     ensure_directories,
+    get_dataset_paths,
 )
 from src.data_loader import load_datasets
 from src.eda import run_eda
@@ -28,7 +30,7 @@ from src.model import build_densenet121_model, prepare_for_fine_tuning
 
 
 def set_reproducible_seeds(seed: int = RANDOM_SEED) -> None:
-    """Set Python, NumPy, and TensorFlow seeds."""
+    """Set Python, NumPy, and TensorFlow seeds for reproducibility."""
     random.seed(seed)
     np.random.seed(seed)
     tf.keras.utils.set_random_seed(seed)
@@ -90,11 +92,11 @@ def save_training_plots(history: dict) -> None:
             continue
         epochs = range(1, len(train_values) + 1)
         plt.figure(figsize=(8, 5))
-        plt.plot(epochs, train_values, label=f"Training {metric.title()}")
+        plt.plot(epochs, train_values, label=f"Training {metric.title()}", marker="o", markersize=3)
         if val_values:
-            plt.plot(epochs, val_values, label=f"Validation {metric.title()}")
+            plt.plot(epochs, val_values, label=f"Validation {metric.title()}", marker="s", markersize=3)
         if 0 < stage_boundary < len(train_values):
-            plt.axvline(stage_boundary + 0.5, linestyle="--", label="Fine-tuning begins")
+            plt.axvline(stage_boundary + 0.5, linestyle="--", color="gray", label="Fine-tuning begins")
         plt.title(title)
         plt.xlabel("Epoch")
         plt.ylabel(metric.title())
@@ -117,7 +119,12 @@ def _select_best_stage_model(val_ds: tf.data.Dataset) -> tuple[tf.keras.Model, s
     return min(candidates, key=lambda item: item[2])
 
 
-def train(initial_epochs: int = INITIAL_EPOCHS, fine_tune_epochs: int = FINE_TUNE_EPOCHS) -> Path:
+def train(
+    initial_epochs: int = INITIAL_EPOCHS,
+    fine_tune_epochs: int = FINE_TUNE_EPOCHS,
+    batch_size: int = BATCH_SIZE,
+    dataset_dir: Path | str | None = None,
+) -> Path:
     """Run EDA, feature extraction, selective fine-tuning, and save the best model."""
     if initial_epochs <= 0 or fine_tune_epochs <= 0:
         raise ValueError("Both training stage epoch counts must be greater than zero.")
@@ -125,8 +132,12 @@ def train(initial_epochs: int = INITIAL_EPOCHS, fine_tune_epochs: int = FINE_TUN
     ensure_directories()
     set_reproducible_seeds()
 
-    print("Running dataset analysis...")
-    stats = run_eda()
+    dataset_root, training_dir, _ = get_dataset_paths(dataset_dir)
+    print(f"Dataset root: {dataset_root}")
+    print(f"Training directory: {training_dir}")
+
+    print("\nRunning exploratory dataset analysis...")
+    stats = run_eda(training_dir=training_dir)
     print(f"Training images detected: {stats['total_images']}")
     if stats.get("corrupted_files"):
         examples = ", ".join(stats["corrupted_files"][:5])
@@ -136,9 +147,13 @@ def train(initial_epochs: int = INITIAL_EPOCHS, fine_tune_epochs: int = FINE_TUN
             f"Remove or replace them before training. Examples: {examples}{suffix}"
         )
 
-    train_ds, val_ds, _ = load_datasets()
+    print("\nLoading datasets...")
+    train_ds, val_ds, _ = load_datasets(dataset_dir=dataset_dir, batch_size=batch_size)
 
-    print("\nStage 1/2: feature extraction with frozen DenseNet121 backbone")
+    print("\n=======================================================")
+    print(f"Stage 1/2: Feature extraction ({initial_epochs} epochs)")
+    print("Backbone frozen; training classification head only")
+    print("=======================================================")
     model, _ = build_densenet121_model()
     stage1_history = model.fit(
         train_ds,
@@ -147,7 +162,10 @@ def train(initial_epochs: int = INITIAL_EPOCHS, fine_tune_epochs: int = FINE_TUN
         callbacks=make_callbacks(STAGE1_MODEL_PATH),
     )
 
-    print("\nStage 2/2: selective fine-tuning of upper DenseNet121 layers")
+    print("\n=======================================================")
+    print(f"Stage 2/2: Selective fine-tuning ({fine_tune_epochs} epochs)")
+    print(f"Unfreezing upper {FINE_TUNE_LAYERS} layers (BatchNorm frozen, low LR)")
+    print("=======================================================")
     stage1_best = tf.keras.models.load_model(STAGE1_MODEL_PATH)
     fine_tune_model = prepare_for_fine_tuning(stage1_best, FINE_TUNE_LAYERS)
     stage2_history = fine_tune_model.fit(
@@ -163,22 +181,29 @@ def train(initial_epochs: int = INITIAL_EPOCHS, fine_tune_epochs: int = FINE_TUN
 
     best_model, best_stage, best_val_loss = _select_best_stage_model(val_ds)
     best_model.save(MODEL_PATH)
-    print(f"\nSaved final model: {MODEL_PATH}")
-    print(f"Selected checkpoint stage: {best_stage} (validation loss={best_val_loss:.6f})")
+    print(f"\nSaved final model to: {MODEL_PATH}")
+    print(f"Selected best stage: {best_stage} (validation loss={best_val_loss:.6f})")
     print("Run `python -m src.evaluate` to calculate test metrics.")
     return MODEL_PATH
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train the DenseNet121 brain MRI classifier.")
-    parser.add_argument("--initial-epochs", type=int, default=INITIAL_EPOCHS)
-    parser.add_argument("--fine-tune-epochs", type=int, default=FINE_TUNE_EPOCHS)
+    parser.add_argument("--dataset-dir", type=Path, default=None, help="Path to dataset root")
+    parser.add_argument("--initial-epochs", type=int, default=INITIAL_EPOCHS, help="Stage 1 epochs")
+    parser.add_argument("--fine-tune-epochs", type=int, default=FINE_TUNE_EPOCHS, help="Stage 2 epochs")
+    parser.add_argument("--batch-size", type=int, default=BATCH_SIZE, help="Batch size")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parse_args()
     try:
-        train(args.initial_epochs, args.fine_tune_epochs)
+        train(
+            initial_epochs=args.initial_epochs,
+            fine_tune_epochs=args.fine_tune_epochs,
+            batch_size=args.batch_size,
+            dataset_dir=args.dataset_dir,
+        )
     except Exception as exc:
         raise SystemExit(f"Training stopped: {exc}") from exc

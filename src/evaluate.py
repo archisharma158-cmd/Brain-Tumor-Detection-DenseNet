@@ -1,7 +1,9 @@
 """Comprehensive evaluation for a trained DenseNet121 model."""
 from __future__ import annotations
 
+import argparse
 import json
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -33,7 +35,7 @@ from src.data_loader import load_datasets
 def _save_confusion_matrix(matrix: np.ndarray) -> None:
     labels = [DISPLAY_NAMES[name] for name in CLASS_NAMES]
     fig, axis = plt.subplots(figsize=(7, 6))
-    image = axis.imshow(matrix, interpolation="nearest")
+    image = axis.imshow(matrix, interpolation="nearest", cmap="Blues")
     fig.colorbar(image, ax=axis)
     axis.set(
         xticks=np.arange(len(labels)),
@@ -55,6 +57,7 @@ def _save_confusion_matrix(matrix: np.ndarray) -> None:
                 ha="center",
                 va="center",
                 color="white" if matrix[row, col] > threshold else "black",
+                fontweight="bold",
             )
     fig.tight_layout()
     fig.savefig(PLOTS_DIR / "confusion_matrix.png", dpi=160)
@@ -101,7 +104,7 @@ def _save_multiclass_roc(y_true: np.ndarray, probabilities: np.ndarray) -> dict[
         )
         plotted = True
     if plotted:
-        axis.plot([0, 1], [0, 1], linestyle="--", label="Chance")
+        axis.plot([0, 1], [0, 1], linestyle="--", color="gray", label="Chance")
         axis.set_xlabel("False Positive Rate")
         axis.set_ylabel("True Positive Rate")
         axis.set_title("One-vs-Rest ROC Curves")
@@ -112,17 +115,22 @@ def _save_multiclass_roc(y_true: np.ndarray, probabilities: np.ndarray) -> dict[
     return auc_values
 
 
-def evaluate() -> dict:
+def evaluate(
+    model_path: Path | str = MODEL_PATH,
+    dataset_dir: Path | str | None = None,
+) -> dict:
     """Evaluate the saved model using the actual testing split."""
     ensure_directories()
-    if not MODEL_PATH.is_file():
+    target_model_path = Path(model_path)
+    if not target_model_path.is_file():
         raise FileNotFoundError(
-            f"No trained model found at {MODEL_PATH}. Run `python -m src.train` first."
+            f"No trained model found at {target_model_path}. Run `python -m src.train` first."
         )
 
-    _, _, test_ds = load_datasets()
-    model = tf.keras.models.load_model(MODEL_PATH)
+    _, _, test_ds = load_datasets(dataset_dir=dataset_dir)
+    model = tf.keras.models.load_model(target_model_path)
 
+    print("Evaluating model on test dataset...")
     probabilities = model.predict(test_ds, verbose=1)
     y_true = np.concatenate([np.argmax(labels.numpy(), axis=1) for _, labels in test_ds])
     y_pred = np.argmax(probabilities, axis=1)
@@ -154,12 +162,21 @@ def evaluate() -> dict:
     _save_confusion_matrix(matrix)
     _save_class_metrics(report)
 
+    print("\nEvaluation metrics:")
     print(json.dumps(metrics, indent=2))
     return metrics
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Evaluate the trained DenseNet121 model on the test split.")
+    parser.add_argument("--model-path", type=Path, default=MODEL_PATH, help="Path to saved .keras model")
+    parser.add_argument("--dataset-dir", type=Path, default=None, help="Path to dataset root")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
     try:
-        evaluate()
+        evaluate(model_path=args.model_path, dataset_dir=args.dataset_dir)
     except Exception as exc:
         raise SystemExit(f"Evaluation stopped: {exc}") from exc

@@ -1,6 +1,7 @@
 """Exploratory dataset analysis computed only from real files on disk."""
 from __future__ import annotations
 
+import argparse
 import json
 from collections import Counter
 from pathlib import Path
@@ -14,9 +15,10 @@ from src.config import (
     DISPLAY_NAMES,
     PLOTS_DIR,
     SUPPORTED_EXTENSIONS,
-    TRAINING_DIR,
     ensure_directories,
+    get_training_dir,
 )
+from src.dataset_utils import resolve_class_directory
 
 
 def _image_files(directory: Path) -> list[Path]:
@@ -27,8 +29,14 @@ def _image_files(directory: Path) -> list[Path]:
     )
 
 
-def analyze_dataset(training_dir: Path = TRAINING_DIR) -> dict:
+def analyze_dataset(
+    training_dir: Path | None = None,
+    dataset_dir: Path | str | None = None,
+) -> dict:
     """Compute class counts, dimensions, corrupt files, and imbalance from disk."""
+    if training_dir is None:
+        training_dir = get_training_dir(dataset_dir)
+
     if not training_dir.is_dir():
         raise FileNotFoundError(
             f"Training dataset not found at {training_dir}. Add the dataset before running EDA."
@@ -39,9 +47,11 @@ def analyze_dataset(training_dir: Path = TRAINING_DIR) -> dict:
     corrupt_files: list[str] = []
 
     for class_name in CLASS_NAMES:
-        class_dir = training_dir / class_name
-        if not class_dir.is_dir():
-            raise FileNotFoundError(f"Expected class folder not found: {class_dir}")
+        class_dir = resolve_class_directory(training_dir, class_name)
+        if class_dir is None or not class_dir.is_dir():
+            raise FileNotFoundError(
+                f"Expected class folder for '{class_name}' not found in: {training_dir}"
+            )
         files = _image_files(class_dir)
         counts[class_name] = len(files)
         for path in files:
@@ -87,13 +97,22 @@ def save_class_distribution(stats: dict) -> Path:
     return path
 
 
-def save_sample_grid(training_dir: Path = TRAINING_DIR) -> Path | None:
+def save_sample_grid(
+    training_dir: Path | None = None,
+    dataset_dir: Path | str | None = None,
+) -> Path | None:
     ensure_directories()
+    if training_dir is None:
+        training_dir = get_training_dir(dataset_dir)
+
     examples: list[tuple[str, Path]] = []
     for class_name in CLASS_NAMES:
-        files = _image_files(training_dir / class_name)
-        if files:
-            examples.append((class_name, files[0]))
+        class_dir = resolve_class_directory(training_dir, class_name)
+        if class_dir is not None:
+            files = _image_files(class_dir)
+            if files:
+                examples.append((class_name, files[0]))
+
     if not examples:
         return None
 
@@ -112,19 +131,32 @@ def save_sample_grid(training_dir: Path = TRAINING_DIR) -> Path | None:
     return path
 
 
-def run_eda(training_dir: Path = TRAINING_DIR) -> dict:
-    """Run EDA and save only artifacts derived from the actual dataset."""
+def run_eda(
+    training_dir: Path | None = None,
+    dataset_dir: Path | str | None = None,
+) -> dict:
+    """Run EDA using the resolved dataset path and save only artifacts derived from real data."""
     ensure_directories()
-    stats = analyze_dataset(training_dir)
+    if training_dir is None:
+        training_dir = get_training_dir(dataset_dir)
+    stats = analyze_dataset(training_dir=training_dir)
     DATASET_STATS_PATH.write_text(json.dumps(stats, indent=2), encoding="utf-8")
     save_class_distribution(stats)
-    save_sample_grid(training_dir)
+    save_sample_grid(training_dir=training_dir)
     return stats
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run exploratory data analysis on the brain MRI dataset.")
+    parser.add_argument("--dataset-dir", type=Path, default=None, help="Path to dataset root directory")
+    parser.add_argument("--training-dir", type=Path, default=None, help="Path to Training directory")
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
+    args = parse_args()
     try:
-        result = run_eda()
+        result = run_eda(training_dir=args.training_dir, dataset_dir=args.dataset_dir)
+        print(json.dumps(result, indent=2))
     except (FileNotFoundError, ValueError) as exc:
         raise SystemExit(f"EDA stopped: {exc}") from exc
-    print(json.dumps(result, indent=2))

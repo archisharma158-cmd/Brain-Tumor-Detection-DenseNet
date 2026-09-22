@@ -17,7 +17,8 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Dataset and trained model artifacts
-dataset/
+dataset/*
+!dataset/README.md
 models/*.keras
 models/*.h5
 
