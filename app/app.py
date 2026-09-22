@@ -70,31 +70,31 @@ st.markdown(
         background-color: #F8FAFD;
         background-image:
             /* Layer 1: Ambient Clinical Pink Glow (Top Right) */
-            radial-gradient(ellipse 950px 750px at 94% 2%, rgba(236, 72, 153, 0.055) 0%, rgba(244, 114, 182, 0.018) 45%, transparent 70%),
-            /* Layer 2: Deep Navy Clinical Glow (Top Left) */
-            radial-gradient(ellipse 900px 700px at 8% 14%, rgba(16, 50, 83, 0.045) 0%, rgba(23, 71, 111, 0.015) 45%, transparent 70%),
-            /* Layer 3: Secondary Soft Pink Glow (Mid-Lower Right) */
-            radial-gradient(ellipse 850px 650px at 88% 68%, rgba(219, 39, 119, 0.03) 0%, transparent 65%),
-            /* Layer 4: Ambient Navy Anchor Glow (Bottom Left) */
-            radial-gradient(ellipse 900px 700px at 15% 92%, rgba(10, 31, 54, 0.04) 0%, transparent 65%),
-            /* Layer 5: Faint Medical Waves & Neural Nodes (Abstract Clinical Lattice) */
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300' viewBox='0 0 600 300' fill='none'%3E%3Cpath d='M0 120 C150 90, 250 160, 400 130 C480 115, 540 135, 600 125' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.035' fill='none'/%3E%3Cpath d='M0 180 C120 150, 220 220, 360 190 C450 170, 520 200, 600 185' stroke='%23EC4899' stroke-width='1' stroke-opacity='0.03' fill='none'/%3E%3Cpath d='M0 240 C180 200, 300 280, 450 230 C520 210, 570 225, 600 220' stroke='%23103253' stroke-width='0.9' stroke-opacity='0.025' fill='none'/%3E%3Ccircle cx='400' cy='130' r='2' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='360' cy='190' r='2' fill='%23EC4899' fill-opacity='0.05'/%3E%3C/svg%3E"),
-            /* Layer 6: Calibration Micro-Dots (Medical Sensor & Registration Raster) */
-            radial-gradient(circle, rgba(16, 50, 83, 0.045) 1.1px, transparent 1.1px),
-            /* Layer 7: Precision Technical Grid Lines (Radiology Scan Grid) */
-            linear-gradient(to right, rgba(16, 50, 83, 0.02) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(16, 50, 83, 0.02) 1px, transparent 1px),
-            /* Layer 8: Base Light Clinical Canvas Gradient */
-            linear-gradient(180deg, #FAFBFD 0%, #F5F8FC 50%, #EFF4F9 100%);
+            radial-gradient(ellipse 950px 750px at 94% 0%, rgba(236, 72, 153, 0.055) 0%, rgba(244, 114, 182, 0.015) 50%, transparent 75%),
+            /* Layer 2: Deep Clinical Navy Glow (Lower Left) */
+            radial-gradient(ellipse 950px 750px at 8% 100%, rgba(10, 31, 54, 0.045) 0%, rgba(16, 50, 83, 0.015) 50%, transparent 75%),
+            /* Layer 3: Faint Upper-Left Navy Focus */
+            radial-gradient(ellipse 800px 600px at 6% 14%, rgba(16, 50, 83, 0.035) 0%, transparent 65%),
+            /* Layer 4: Faint Mid-Right Pink Accent */
+            radial-gradient(ellipse 800px 600px at 92% 64%, rgba(219, 39, 119, 0.025) 0%, transparent 60%),
+            /* Layer 5: Topographic MRI Contours & Neural Network Nodes */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500' fill='none'%3E%3Cpath d='M80 260 C120 180, 240 140, 380 180 C480 210, 560 160, 680 190 C740 205, 780 240, 800 250' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.035' stroke-dasharray='4 4' fill='none'/%3E%3Cpath d='M0 320 C140 280, 260 360, 420 310 C540 270, 640 330, 800 290' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.03' fill='none'/%3E%3Cpath d='M40 120 C180 80, 320 160, 480 110 C600 70, 700 130, 800 100' stroke='%23EC4899' stroke-width='1' stroke-opacity='0.035' fill='none'/%3E%3Cpath d='M0 420 C160 380, 300 460, 460 410 C620 360, 720 430, 800 400' stroke='%23EC4899' stroke-width='0.9' stroke-opacity='0.025' stroke-dasharray='3 3' fill='none'/%3E%3Cline x1='180' y1='80' x2='320' y2='160' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='320' y1='160' x2='480' y2='110' stroke='%23EC4899' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='480' y1='110' x2='600' y2='70' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='240' y1='140' x2='380' y2='180' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Cline x1='380' y1='180' x2='420' y2='310' stroke='%23EC4899' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Ccircle cx='180' cy='80' r='2.5' fill='%23103253' fill-opacity='0.045'/%3E%3Ccircle cx='320' cy='160' r='2.5' fill='%23EC4899' fill-opacity='0.05'/%3E%3Ccircle cx='480' cy='110' r='3' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='600' cy='70' r='2' fill='%23EC4899' fill-opacity='0.04'/%3E%3Ccircle cx='380' cy='180' r='3' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='420' cy='310' r='2.5' fill='%23EC4899' fill-opacity='0.045'/%3E%3Ccircle cx='540' cy='270' r='2' fill='%23103253' fill-opacity='0.04'/%3E%3C/svg%3E"),
+            /* Layer 6: Microscopic Diagnostic Dot Pattern (Precision Sensor Raster) */
+            radial-gradient(circle, rgba(16, 50, 83, 0.04) 1px, transparent 1px),
+            /* Layer 7: Subtle Diagnostic Scan Grid (Telemetry Lines) */
+            linear-gradient(to right, rgba(16, 50, 83, 0.018) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(16, 50, 83, 0.018) 1px, transparent 1px),
+            /* Layer 8: Base Clinical Canvas (Pale Blue-White Gradient) */
+            linear-gradient(180deg, #F8FAFD 0%, #F4F7FB 40%, #EDF3F9 100%);
         background-size:
             auto,
             auto,
             auto,
             auto,
-            600px 300px,
-            36px 36px,
-            72px 72px,
-            72px 72px,
+            800px 500px,
+            32px 32px,
+            64px 64px,
+            64px 64px,
             100% 100%;
         background-position:
             center top,
@@ -121,18 +121,40 @@ st.markdown(
     }
 
     [data-testid="stAppViewContainer"] {
-        background: transparent;
+        background: transparent !important;
     }
 
+    /* Hide default Streamlit top header toolbar, decoration line, and menu */
+    [data-testid="stDecoration"],
+    [data-testid="stToolbar"],
+    #MainMenu,
+    header::before {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        opacity: 0 !important;
+    }
+
+    /* Make the top header area completely transparent and zero height */
     [data-testid="stHeader"] {
-        background: rgba(250, 251, 253, 0.85);
-        border-bottom: 1px solid rgba(16, 50, 83, 0.08);
-        backdrop-filter: blur(16px);
+        background: transparent !important;
+        border-bottom: none !important;
+        box-shadow: none !important;
+        height: 0px !important;
+        min-height: 0px !important;
+        max-height: 0px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        backdrop-filter: none !important;
+        z-index: 999990 !important;
+        pointer-events: none !important;
     }
 
+    /* Clean up excessive top whitespace so content starts naturally near the top */
     .block-container {
         max-width: 1260px;
-        padding-top: 2.2rem;
+        padding-top: 1.25rem !important;
         padding-bottom: 4rem;
     }
 
@@ -145,7 +167,7 @@ st.markdown(
         color: var(--ink);
     }
 
-    /* Sidebar */
+    /* Sidebar Base */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, var(--navy-950) 0%, #0A2847 100%);
         border-right: 1px solid rgba(255,255,255,.08);
@@ -155,41 +177,155 @@ st.markdown(
         color: #F8FBFF;
     }
 
+    /* =========================================================
+       SIDEBAR NAVIGATION: CLEAN BUTTON-ROW DESIGN (NO RADIO CIRCLES)
+       ========================================================= */
+
+    /* Hide the radio input element */
+    [data-testid="stSidebar"] [role="radiogroup"] input[type="radio"] {
+        position: absolute !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Hide ONLY the radio circular marks (outer circle and inner dot), keeping text fully visible */
+    [data-testid="stSidebar"] [role="radiogroup"] [data-testid="stRadioOption"] > div > div:first-child,
+    [data-testid="stSidebar"] [role="radiogroup"] label > div > div:first-child,
+    [data-testid="stSidebar"] [role="radiogroup"] div[class*="e1mpz0hj4"],
+    [data-testid="stSidebar"] [role="radiogroup"] div[class*="e1mpz0hj5"] {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Sidebar Navigation Container */
+    [data-testid="stSidebar"] [role="radiogroup"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.48rem !important;
+        width: 100% !important;
+    }
+
+    /* Ensure the inner option row wrapper is fully visible, aligned, and full width */
+    [data-testid="stSidebar"] [role="radiogroup"] [data-testid="stRadioOption"] > div,
+    [data-testid="stSidebar"] [role="radiogroup"] label > div {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Clickable Navigation Menu Row */
     [data-testid="stSidebar"] [role="radiogroup"] label {
-        border-radius: 12px;
-        padding: .35rem .55rem;
-        margin-bottom: .2rem;
-        transition: all .18s ease;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding: 0.70rem 0.95rem !important;
+        margin: 0 !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.10) !important;
+        border-left: 3.5px solid transparent !important;
+        background: rgba(255, 255, 255, 0.045) !important;
+        cursor: pointer !important;
+        user-select: none !important;
+        transition: all 0.20s cubic-bezier(0.22, 1, 0.36, 1) !important;
     }
 
+    /* Inactive text styling: high-contrast, clean, readable clinical ice-white */
+    [data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"],
+    [data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"] p {
+        display: flex !important;
+        align-items: center !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #E2ECF6 !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        transition: color 0.18s ease !important;
+    }
+
+    /* Hover state: smooth movement & subtle highlight */
     [data-testid="stSidebar"] [role="radiogroup"] label:hover {
-        background: rgba(255,255,255,.08);
+        background: rgba(255, 255, 255, 0.10) !important;
+        border-color: rgba(244, 114, 182, 0.40) !important;
+        transform: translateX(4px) !important;
     }
 
-    [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
-        background: linear-gradient(90deg, rgba(236,72,153,.30), rgba(236,72,153,.12));
-        border: 1px solid rgba(244,114,182,.34);
+    [data-testid="stSidebar"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important;
     }
 
-    /* Make the collapsed sidebar control a clear, separate navigation icon. */
+    /* Active state: pink highlight and pink left border */
+    [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked),
+    [data-testid="stSidebar"] [role="radiogroup"] label[aria-checked="true"],
+    [data-testid="stSidebar"] [role="radiogroup"] label:has([aria-checked="true"]) {
+        background: linear-gradient(90deg, rgba(236, 72, 153, 0.28) 0%, rgba(236, 72, 153, 0.08) 100%) !important;
+        border: 1px solid rgba(244, 114, 182, 0.55) !important;
+        border-left: 4px solid var(--pink-500) !important;
+        box-shadow: 0 4px 20px rgba(219, 39, 119, 0.24) !important;
+        transform: translateX(2px) !important;
+    }
+
+    [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [role="radiogroup"] label[aria-checked="true"] [data-testid="stMarkdownContainer"] p,
+    [data-testid="stSidebar"] [role="radiogroup"] label:has([aria-checked="true"]) [data-testid="stMarkdownContainer"] p {
+        color: #FFFFFF !important;
+        font-weight: 750 !important;
+    }
+
+    /* Custom pink sidebar navigation icon (collapsed control trigger) */
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="collapsedControl"] {
+        position: fixed !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 999999 !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
     [data-testid="stSidebarCollapsedControl"] button,
     [data-testid="collapsedControl"] button {
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 14px !important;
+        width: 46px !important;
+        height: 46px !important;
+        border-radius: 13px !important;
         background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
-        border: 1px solid rgba(255,255,255,.7) !important;
-        box-shadow: 0 12px 30px rgba(219,39,119,.28) !important;
+        border: 1px solid rgba(255, 255, 255, 0.75) !important;
+        box-shadow: 0 10px 26px rgba(219, 39, 119, 0.32) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        pointer-events: auto !important;
     }
 
     [data-testid="stSidebarCollapsedControl"] button:hover,
     [data-testid="collapsedControl"] button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 16px 34px rgba(219,39,119,.38) !important;
+        transform: translateY(-1px) scale(1.02);
+        box-shadow: 0 14px 32px rgba(219, 39, 119, 0.42) !important;
     }
 
     [data-testid="stSidebarCollapsedControl"] svg,
     [data-testid="collapsedControl"] svg {
+        display: block !important;
+        visibility: visible !important;
+        width: 22px !important;
+        height: 22px !important;
         color: white !important;
         fill: white !important;
     }
@@ -504,6 +640,285 @@ st.markdown(
         color: var(--navy-900) !important;
         border-radius: 7px;
     }
+
+    /* =========================================================
+   PROFESSIONAL CLINICAL ANIMATION SYSTEM
+   ========================================================= */
+
+@keyframes clinicalPageIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes clinicalCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(.992);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes clinicalHeroIn {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes sidebarIn {
+    from {
+        opacity: .75;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes statusPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px rgba(36,180,126,.12);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(36,180,126,.055);
+    }
+}
+
+@keyframes menuPulse {
+    0%, 100% {
+        box-shadow: 0 12px 30px rgba(219,39,119,.28);
+    }
+
+    50% {
+        box-shadow: 0 12px 34px rgba(219,39,119,.40);
+    }
+}
+
+
+/* Smooth page entrance */
+
+.block-container {
+    animation: clinicalPageIn .46s
+        cubic-bezier(.22, 1, .36, 1) both;
+}
+
+
+/* Sidebar entrance */
+
+[data-testid="stSidebar"] {
+    animation: sidebarIn .28s
+        cubic-bezier(.22, 1, .36, 1) both;
+}
+
+
+/* Hero entrance */
+
+.hero-shell {
+    animation: clinicalHeroIn .58s
+        cubic-bezier(.22, 1, .36, 1) both;
+}
+
+
+/* Cards and important elements */
+
+.clinical-card,
+div[data-testid="stMetric"],
+[data-testid="stFileUploader"],
+[data-testid="stAlert"],
+[data-testid="stPlotlyChart"],
+[data-testid="stDataFrame"],
+.important-note,
+.section-intro,
+.medical-disclaimer {
+    animation: clinicalCardIn .48s
+        cubic-bezier(.22, 1, .36, 1) both;
+}
+
+
+/* Clinical card hover */
+
+.clinical-card,
+div[data-testid="stMetric"] {
+    transition:
+        transform .24s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .24s ease,
+        border-color .24s ease;
+}
+
+.clinical-card:hover,
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
+    border-color: rgba(236,72,153,.22);
+    box-shadow: 0 18px 42px rgba(6,20,38,.10);
+}
+
+
+/* Feature icon */
+
+.feature-icon {
+    transition:
+        transform .28s cubic-bezier(.22, 1, .36, 1),
+        background .28s ease;
+}
+
+.clinical-card:hover .feature-icon {
+    transform: translateY(-2px) scale(1.06);
+    background: #FBCFE8;
+}
+
+
+/* Model-ready indicator */
+
+.status-dot {
+    animation: statusPulse 2.6s ease-in-out infinite;
+}
+
+
+/* Navigation button */
+
+[data-testid="stSidebarCollapsedControl"] button,
+[data-testid="collapsedControl"] button {
+    animation: menuPulse 2.8s ease-in-out infinite;
+
+    transition:
+        transform .20s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .20s ease !important;
+}
+
+[data-testid="stSidebarCollapsedControl"] button:active,
+[data-testid="collapsedControl"] button:active {
+    transform: scale(.94) !important;
+}
+
+
+/* Sidebar navigation items */
+
+[data-testid="stSidebar"] [role="radiogroup"] label {
+    transition:
+        transform .20s cubic-bezier(.22, 1, .36, 1),
+        background .20s ease,
+        border-color .20s ease,
+        box-shadow .20s ease !important;
+}
+
+[data-testid="stSidebar"] [role="radiogroup"] label:hover {
+    transform: translateX(4px) !important;
+}
+
+
+/* Main buttons */
+
+.stButton > button,
+.stDownloadButton > button {
+    background-size: 180% 180% !important;
+    background-position: left center !important;
+
+    transition:
+        transform .18s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .18s ease,
+        background-position .38s ease !important;
+}
+
+.stButton > button:hover,
+.stDownloadButton > button:hover {
+    transform: translateY(-2px) scale(1.008);
+    background-position: right center !important;
+}
+
+.stButton > button:active,
+.stDownloadButton > button:active {
+    transform: translateY(1px) scale(.975) !important;
+
+    box-shadow:
+        0 5px 14px rgba(219,39,119,.22) !important;
+
+    transition-duration: .07s !important;
+}
+
+
+/* MRI uploader */
+
+[data-testid="stFileUploader"] section {
+    transition:
+        transform .22s cubic-bezier(.22, 1, .36, 1),
+        background .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease;
+}
+
+[data-testid="stFileUploader"] section:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 30px rgba(16,50,83,.07);
+}
+
+
+/* MRI images and Grad-CAM images */
+
+.stImage img {
+    transition:
+        transform .28s cubic-bezier(.22, 1, .36, 1),
+        box-shadow .28s ease;
+}
+
+.stImage img:hover {
+    transform: translateY(-2px) scale(1.008);
+
+    box-shadow:
+        0 16px 34px rgba(6,20,38,.11);
+}
+
+
+/* Expandable sections */
+
+[data-testid="stExpander"] {
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease;
+}
+
+[data-testid="stExpander"]:hover {
+    transform: translateY(-1px);
+}
+
+
+/* Loading state */
+
+[data-testid="stSpinner"] {
+    animation: clinicalCardIn .28s
+        cubic-bezier(.22, 1, .36, 1) both;
+}
+
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
 
     @media (max-width: 900px) {
         .hero-grid { grid-template-columns: 1fr; }
@@ -1018,11 +1433,11 @@ def render_about() -> None:
 # -----------------------------------------------------------------------------
 PAGES = ("Home", "MRI Analysis", "Model Information", "Performance", "About Project")
 PAGE_LABELS = {
-    "Home": "⌂  Home",
-    "MRI Analysis": "✚  MRI Analysis",
-    "Model Information": "◫  Model Information",
-    "Performance": "◔  Performance",
-    "About Project": "ⓘ  About Project",
+    "Home": "🏠  Home",
+    "MRI Analysis": "🔬  MRI Analysis",
+    "Model Information": "🧠  Model Information",
+    "Performance": "📊  Performance",
+    "About Project": "ℹ️  About Project",
 }
 
 if "nav_page" not in st.session_state:
@@ -1049,13 +1464,14 @@ page = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 model_sidebar_status = "Ready" if MODEL_PATH.is_file() else "Not trained"
+status_color = "#34D399" if MODEL_PATH.is_file() else "#F87171"
 st.sidebar.markdown(
     f"""
-    <div style="font-size:.78rem;color:#B9CCDC;line-height:1.7;">
-        <strong style="color:white;">System status</strong><br>
-        Model · {model_sidebar_status}<br>
-        Architecture · DenseNet121<br>
-        Explainability · Grad-CAM
+    <div style="font-size:.82rem;color:#C8D7E6;line-height:1.75;padding:0.2rem 0.4rem;">
+        <div style="color:#FFFFFF;font-weight:750;margin-bottom:0.25rem;letter-spacing:-0.01em;">System status</div>
+        <div>Model · <strong style="color:{status_color};">{model_sidebar_status}</strong></div>
+        <div>Architecture · <span style="color:#FFFFFF;">DenseNet121</span></div>
+        <div>Explainability · <span style="color:#F9A8D4;">Grad-CAM</span></div>
     </div>
     """,
     unsafe_allow_html=True,
