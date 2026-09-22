@@ -1,4 +1,4 @@
-"""Streamlit interface for Brain Tumor Detection using DenseNet121."""
+"""Polished Streamlit interface for Brain Tumor Detection using DenseNet121."""
 from __future__ import annotations
 
 from datetime import datetime
@@ -7,12 +7,8 @@ import sys
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 ROOT_STR = str(ROOT_DIR)
-
-# Ensure the project root has priority over the app/ directory.
-# This prevents app/app.py from shadowing the app package.
 if ROOT_STR in sys.path:
     sys.path.remove(ROOT_STR)
-
 sys.path.insert(0, ROOT_STR)
 
 import pandas as pd
@@ -33,38 +29,496 @@ from src.config import (
 )
 from src.preprocessing import load_rgb_image
 
+
 st.set_page_config(
-    page_title="Brain Tumor Detection | DenseNet121",
+    page_title="Brain MRI AI | DenseNet121",
     page_icon="🧠",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
+
+# -----------------------------------------------------------------------------
+# Clinical UI system
+# -----------------------------------------------------------------------------
 st.markdown(
     """
     <style>
-    .stApp {background: radial-gradient(circle at 15% 10%, #102a43 0, #071521 34%, #040b12 76%); color: #ecf8ff;}
-    [data-testid="stSidebar"] {background: #07131f; border-right: 1px solid rgba(80,210,255,.15);}
-    .hero {padding: 2.3rem; border: 1px solid rgba(45,212,255,.22); border-radius: 24px;
-           background: linear-gradient(135deg, rgba(14,42,68,.94), rgba(5,20,33,.96));
-           box-shadow: 0 18px 55px rgba(0,0,0,.25); margin-bottom: 1.2rem;}
-    .hero h1 {font-size: 2.7rem; margin-bottom: .4rem;}
-    .accent {color: #43d9ff;}
-    .muted {color: #a7bfd0;}
-    .feature-card {min-height: 130px; padding: 1.15rem; border-radius: 18px;
-                   border: 1px solid rgba(75,196,255,.18); background: rgba(8,27,43,.78);}
-    .result-card {padding: 1.2rem; border-radius: 18px; border: 1px solid rgba(67,217,255,.24);
-                  background: rgba(7,24,39,.90);}
-    .disclaimer {padding: .95rem 1.1rem; border-left: 4px solid #f0b429; background: rgba(240,180,41,.08);
-                 border-radius: 8px; color: #dce9f2; margin: .8rem 0;}
-    div[data-testid="stMetric"] {background: rgba(7,24,39,.82); border: 1px solid rgba(67,217,255,.18);
-                                 padding: .7rem; border-radius: 14px;}
+    :root {
+        --navy-950: #061426;
+        --navy-900: #0A1F36;
+        --navy-800: #103253;
+        --navy-700: #17476F;
+        --pink-600: #DB2777;
+        --pink-500: #EC4899;
+        --pink-400: #F472B6;
+        --pink-100: #FCE7F3;
+        --pink-50: #FDF2F8;
+        --ink: #102235;
+        --muted: #5D7186;
+        --line: #DDE6EE;
+        --surface: #FFFFFF;
+        --canvas: #F6F8FC;
+        --success: #16856B;
+    }
+
+    html, body, [class*="css"] {
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .stApp {
+        background-color: #F8FAFD;
+        background-image:
+            /* Layer 1: Ambient Clinical Pink Glow (Top Right) */
+            radial-gradient(ellipse 950px 750px at 94% 2%, rgba(236, 72, 153, 0.055) 0%, rgba(244, 114, 182, 0.018) 45%, transparent 70%),
+            /* Layer 2: Deep Navy Clinical Glow (Top Left) */
+            radial-gradient(ellipse 900px 700px at 8% 14%, rgba(16, 50, 83, 0.045) 0%, rgba(23, 71, 111, 0.015) 45%, transparent 70%),
+            /* Layer 3: Secondary Soft Pink Glow (Mid-Lower Right) */
+            radial-gradient(ellipse 850px 650px at 88% 68%, rgba(219, 39, 119, 0.03) 0%, transparent 65%),
+            /* Layer 4: Ambient Navy Anchor Glow (Bottom Left) */
+            radial-gradient(ellipse 900px 700px at 15% 92%, rgba(10, 31, 54, 0.04) 0%, transparent 65%),
+            /* Layer 5: Faint Medical Waves & Neural Nodes (Abstract Clinical Lattice) */
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300' viewBox='0 0 600 300' fill='none'%3E%3Cpath d='M0 120 C150 90, 250 160, 400 130 C480 115, 540 135, 600 125' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.035' fill='none'/%3E%3Cpath d='M0 180 C120 150, 220 220, 360 190 C450 170, 520 200, 600 185' stroke='%23EC4899' stroke-width='1' stroke-opacity='0.03' fill='none'/%3E%3Cpath d='M0 240 C180 200, 300 280, 450 230 C520 210, 570 225, 600 220' stroke='%23103253' stroke-width='0.9' stroke-opacity='0.025' fill='none'/%3E%3Ccircle cx='400' cy='130' r='2' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='360' cy='190' r='2' fill='%23EC4899' fill-opacity='0.05'/%3E%3C/svg%3E"),
+            /* Layer 6: Calibration Micro-Dots (Medical Sensor & Registration Raster) */
+            radial-gradient(circle, rgba(16, 50, 83, 0.045) 1.1px, transparent 1.1px),
+            /* Layer 7: Precision Technical Grid Lines (Radiology Scan Grid) */
+            linear-gradient(to right, rgba(16, 50, 83, 0.02) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(16, 50, 83, 0.02) 1px, transparent 1px),
+            /* Layer 8: Base Light Clinical Canvas Gradient */
+            linear-gradient(180deg, #FAFBFD 0%, #F5F8FC 50%, #EFF4F9 100%);
+        background-size:
+            auto,
+            auto,
+            auto,
+            auto,
+            600px 300px,
+            36px 36px,
+            72px 72px,
+            72px 72px,
+            100% 100%;
+        background-position:
+            center top,
+            center top,
+            center top,
+            center top,
+            0 0,
+            0 0,
+            0 0,
+            0 0,
+            0 0;
+        background-repeat:
+            no-repeat,
+            no-repeat,
+            no-repeat,
+            no-repeat,
+            repeat,
+            repeat,
+            repeat,
+            repeat,
+            no-repeat;
+        background-attachment: fixed;
+        color: var(--ink);
+    }
+
+    [data-testid="stAppViewContainer"] {
+        background: transparent;
+    }
+
+    [data-testid="stHeader"] {
+        background: rgba(250, 251, 253, 0.85);
+        border-bottom: 1px solid rgba(16, 50, 83, 0.08);
+        backdrop-filter: blur(16px);
+    }
+
+    .block-container {
+        max-width: 1260px;
+        padding-top: 2.2rem;
+        padding-bottom: 4rem;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--navy-950) !important;
+        letter-spacing: -.02em;
+    }
+
+    p, li, label, .stMarkdown {
+        color: var(--ink);
+    }
+
+    /* Sidebar */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, var(--navy-950) 0%, #0A2847 100%);
+        border-right: 1px solid rgba(255,255,255,.08);
+    }
+
+    [data-testid="stSidebar"] * {
+        color: #F8FBFF;
+    }
+
+    [data-testid="stSidebar"] [role="radiogroup"] label {
+        border-radius: 12px;
+        padding: .35rem .55rem;
+        margin-bottom: .2rem;
+        transition: all .18s ease;
+    }
+
+    [data-testid="stSidebar"] [role="radiogroup"] label:hover {
+        background: rgba(255,255,255,.08);
+    }
+
+    [data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) {
+        background: linear-gradient(90deg, rgba(236,72,153,.30), rgba(236,72,153,.12));
+        border: 1px solid rgba(244,114,182,.34);
+    }
+
+    /* Make the collapsed sidebar control a clear, separate navigation icon. */
+    [data-testid="stSidebarCollapsedControl"] button,
+    [data-testid="collapsedControl"] button {
+        width: 48px !important;
+        height: 48px !important;
+        border-radius: 14px !important;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
+        border: 1px solid rgba(255,255,255,.7) !important;
+        box-shadow: 0 12px 30px rgba(219,39,119,.28) !important;
+    }
+
+    [data-testid="stSidebarCollapsedControl"] button:hover,
+    [data-testid="collapsedControl"] button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 16px 34px rgba(219,39,119,.38) !important;
+    }
+
+    [data-testid="stSidebarCollapsedControl"] svg,
+    [data-testid="collapsedControl"] svg {
+        color: white !important;
+        fill: white !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"] button {
+        border-radius: 10px !important;
+        background: rgba(255,255,255,.08) !important;
+    }
+
+    /* Reusable cards */
+    .clinical-card {
+        background: rgba(255,255,255,.97);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 14px 36px rgba(6,20,38,.07);
+        padding: 1.35rem 1.4rem;
+        height: 100%;
+    }
+
+    .clinical-card h3, .clinical-card h4 {
+        margin-top: 0;
+    }
+
+    .section-intro {
+        background: #FFFFFF;
+        border: 1px solid var(--line);
+        border-left: 5px solid var(--pink-500);
+        border-radius: 14px;
+        padding: 1rem 1.15rem;
+        color: var(--ink);
+        margin: .5rem 0 1.2rem;
+        box-shadow: 0 8px 24px rgba(6,20,38,.04);
+    }
+
+    .important-note {
+        background: linear-gradient(135deg, var(--pink-50), #FFFFFF);
+        border: 1px solid #F8C9DF;
+        border-radius: 15px;
+        padding: 1rem 1.1rem;
+        color: var(--navy-900);
+        margin: .8rem 0 1rem;
+    }
+
+    .medical-disclaimer {
+        background: #FFF8FB;
+        border: 1px solid #F6C6DC;
+        border-left: 5px solid var(--pink-500);
+        border-radius: 14px;
+        padding: 1rem 1.15rem;
+        color: #3A2B35;
+        margin-top: 1.1rem;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        gap: .45rem;
+        align-items: center;
+        padding: .35rem .65rem;
+        border-radius: 999px;
+        background: var(--pink-100);
+        color: #A31359;
+        font-size: .76rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #24B47E;
+        box-shadow: 0 0 0 4px rgba(36,180,126,.12);
+        display: inline-block;
+    }
+
+    /* Hero */
+    .hero-shell {
+        overflow: hidden;
+        position: relative;
+        border-radius: 28px;
+        padding: 2.65rem;
+        background:
+            radial-gradient(circle at 85% 12%, rgba(244,114,182,.28), transparent 18rem),
+            linear-gradient(135deg, var(--navy-950) 0%, #0C2B49 58%, #153B5F 100%);
+        box-shadow: 0 24px 58px rgba(6,20,38,.18);
+        border: 1px solid rgba(255,255,255,.10);
+        margin-bottom: 1.3rem;
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.35fr .85fr;
+        gap: 2.2rem;
+        align-items: center;
+    }
+
+    .hero-copy h1 {
+        color: #FFFFFF !important;
+        font-size: clamp(2.4rem, 5vw, 4.6rem);
+        line-height: 1.02;
+        margin: .8rem 0 1rem;
+        max-width: 800px;
+    }
+
+    .hero-copy p {
+        color: #D9E7F3 !important;
+        font-size: 1.08rem;
+        line-height: 1.75;
+        max-width: 760px;
+        margin-bottom: 1.25rem;
+    }
+
+    .hero-highlight {
+        color: #F9A8D4;
+    }
+
+    .hero-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .65rem;
+        margin-top: 1.2rem;
+    }
+
+    .hero-badge {
+        background: rgba(255,255,255,.09);
+        color: #FFFFFF;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 999px;
+        padding: .48rem .72rem;
+        font-size: .84rem;
+        font-weight: 650;
+    }
+
+    .scan-panel {
+        background: rgba(255,255,255,.96);
+        border-radius: 24px;
+        padding: 1.4rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,.18);
+        border: 1px solid rgba(255,255,255,.7);
+    }
+
+    .scan-frame {
+        min-height: 230px;
+        border-radius: 18px;
+        background:
+            radial-gradient(circle at 50% 44%, rgba(244,114,182,.33) 0 14%, transparent 15%),
+            radial-gradient(circle at 50% 50%, rgba(15,47,78,.14) 0 32%, transparent 33%),
+            linear-gradient(145deg, #F7FAFD, #E7EEF5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .scan-frame::before,
+    .scan-frame::after {
+        content: "";
+        position: absolute;
+        border-radius: 999px;
+        border: 1px solid rgba(16,50,83,.12);
+        width: 170px;
+        height: 170px;
+    }
+
+    .scan-frame::after {
+        width: 110px;
+        height: 110px;
+        border-color: rgba(236,72,153,.25);
+    }
+
+    .brain-glyph {
+        font-size: 4.4rem;
+        z-index: 2;
+        filter: drop-shadow(0 10px 16px rgba(16,50,83,.14));
+    }
+
+    .scan-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        color: var(--navy-900);
+        font-size: .9rem;
+        font-weight: 650;
+    }
+
+    .scan-status span:last-child {
+        color: var(--success);
+    }
+
+    /* Feature cards */
+    .feature-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--pink-100);
+        color: var(--pink-600);
+        font-size: 1.2rem;
+        margin-bottom: .85rem;
+    }
+
+    .feature-title {
+        font-weight: 800;
+        color: var(--navy-950);
+        margin-bottom: .35rem;
+    }
+
+    .feature-copy {
+        color: var(--muted);
+        line-height: 1.55;
+        font-size: .93rem;
+    }
+
+    .step {
+        display: flex;
+        gap: .8rem;
+        align-items: flex-start;
+        padding: .85rem 0;
+        border-bottom: 1px solid #EDF2F6;
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-number {
+        min-width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        background: var(--navy-900);
+        color: white;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: .8rem;
+    }
+
+    .step strong { color: var(--navy-950); }
+    .step small { color: var(--muted); line-height: 1.5; }
+
+    /* Streamlit widgets */
+    div[data-testid="stMetric"] {
+        background: #FFFFFF;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 1rem 1.05rem;
+        box-shadow: 0 10px 28px rgba(6,20,38,.055);
+    }
+
+    div[data-testid="stMetric"] label {
+        color: var(--muted) !important;
+        font-weight: 650 !important;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: var(--navy-950) !important;
+        font-weight: 850 !important;
+    }
+
+    .stButton > button,
+    .stDownloadButton > button {
+        border: 0 !important;
+        border-radius: 13px !important;
+        min-height: 46px;
+        font-weight: 800 !important;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
+        color: #FFFFFF !important;
+        box-shadow: 0 10px 25px rgba(219,39,119,.20) !important;
+        transition: all .18s ease;
+    }
+
+    .stButton > button:hover,
+    .stDownloadButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 30px rgba(219,39,119,.28) !important;
+    }
+
+    [data-testid="stFileUploader"] section {
+        background: #FFFFFF;
+        border: 1.5px dashed #F19CC5;
+        border-radius: 18px;
+        padding: .7rem;
+    }
+
+    [data-testid="stFileUploader"] section:hover {
+        border-color: var(--pink-500);
+        background: var(--pink-50);
+    }
+
+    [data-testid="stAlert"] {
+        border-radius: 14px;
+        border: 1px solid var(--line);
+    }
+
+    [data-testid="stDataFrame"] {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .stImage img {
+        border-radius: 16px;
+    }
+
+    code {
+        background: #EEF3F8 !important;
+        color: var(--navy-900) !important;
+        border-radius: 7px;
+    }
+
+    @media (max-width: 900px) {
+        .hero-grid { grid-template-columns: 1fr; }
+        .hero-shell { padding: 1.6rem; }
+        .scan-panel { margin-top: .4rem; }
+    }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
+# -----------------------------------------------------------------------------
+# Shared helpers
+# -----------------------------------------------------------------------------
 @st.cache_resource(show_spinner=False)
 def get_cached_model(model_path: str, modified_ns: int):
     """Cache model loading while refreshing if the model file changes."""
@@ -72,80 +526,245 @@ def get_cached_model(model_path: str, modified_ns: int):
     return load_model(Path(model_path))
 
 
+def navigate_to(page_name: str) -> None:
+    """Change the sidebar navigation from a button callback."""
+    st.session_state["nav_page"] = page_name
+
+
 def render_disclaimer() -> None:
-    st.markdown(f'<div class="disclaimer">⚠️ {EDUCATIONAL_DISCLAIMER}</div>', unsafe_allow_html=True)
-
-
-def render_home() -> None:
     st.markdown(
-        """
-        <div class="hero">
-          <div class="muted">AI-ASSISTED BRAIN MRI CLASSIFICATION · ACADEMIC PROJECT</div>
-          <h1>Brain Tumor Detection <span class="accent">using DenseNet121</span></h1>
-          <p class="muted">This project uses transfer learning with DenseNet121 to classify brain MRI scans into
-          Glioma, Meningioma, Pituitary Tumor, or No Tumor.</p>
+        f'<div class="medical-disclaimer"><strong>Research-use notice</strong><br>{EDUCATIONAL_DISCLAIMER}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def render_page_header(title: str, subtitle: str, eyebrow: str = "Clinical AI Research Workspace") -> None:
+    st.markdown(
+        f"""
+        <div style="margin-bottom:1.25rem;">
+            <div class="eyebrow">{eyebrow}</div>
+            <h1 style="margin:.7rem 0 .45rem;">{title}</h1>
+            <div class="section-intro" style="margin-top:.45rem;">{subtitle}</div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    columns = st.columns(4)
-    cards = [
-        ("DenseNet121", "A pretrained convolutional backbone for efficient feature reuse."),
-        ("MRI Classification", "Four-category image classification from uploaded brain MRI scans."),
-        ("Transfer Learning", "ImageNet features are adapted in feature-extraction and fine-tuning stages."),
-        ("Grad-CAM", "Visual explanation of image regions that influenced the network output."),
+
+
+def build_probability_chart(probability_frame: pd.DataFrame):
+    chart = px.bar(
+        probability_frame,
+        x="Probability (%)",
+        y="MRI category",
+        orientation="h",
+        range_x=[0, 100],
+        text="Probability (%)",
+    )
+    chart.update_traces(
+        marker_color="#EC4899",
+        texttemplate="%{text:.1f}%",
+        textposition="outside",
+        cliponaxis=False,
+    )
+    chart.update_layout(
+        height=340,
+        margin=dict(l=10, r=34, t=18, b=10),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="#FFFFFF",
+        font=dict(color="#102235"),
+        xaxis=dict(showgrid=True, gridcolor="#E6EDF3", title="Model probability (%)"),
+        yaxis=dict(title=""),
+        bargap=.38,
+    )
+    return chart
+
+
+# -----------------------------------------------------------------------------
+# Pages
+# -----------------------------------------------------------------------------
+def render_home() -> None:
+    metrics = read_json(EVALUATION_METRICS_PATH) or {}
+    accuracy = metrics.get("test_accuracy")
+    accuracy_badge = f"{accuracy * 100:.1f}% held-out test accuracy" if isinstance(accuracy, (int, float)) else "Evaluation available after testing"
+    model_status = "Model ready" if MODEL_PATH.is_file() else "Training required"
+
+    st.markdown(
+        f"""
+        <section class="hero-shell">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <div class="eyebrow" style="background:rgba(252,231,243,.14); color:#FBCFE8; border:1px solid rgba(251,207,232,.18);">
+                        <span class="status-dot"></span> AI-assisted MRI research interface
+                    </div>
+                    <h1>Brain MRI classification, <span class="hero-highlight">explained visually.</span></h1>
+                    <p>
+                        A polished DenseNet121 research workspace for four-class brain MRI classification,
+                        confidence review, and Grad-CAM explainability — built for academic demonstration,
+                        not clinical diagnosis.
+                    </p>
+                    <div class="hero-badges">
+                        <span class="hero-badge">DenseNet121</span>
+                        <span class="hero-badge">4 MRI categories</span>
+                        <span class="hero-badge">Grad-CAM explanation</span>
+                        <span class="hero-badge">{accuracy_badge}</span>
+                    </div>
+                </div>
+                <div class="scan-panel">
+                    <div class="scan-frame"><div class="brain-glyph">🧠</div></div>
+                    <div class="scan-status"><span>DenseNet121 inference engine</span><span>● {model_status}</span></div>
+                </div>
+            </div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    action_col, info_col = st.columns([1.0, 1.75], gap="large")
+    with action_col:
+        st.button(
+            "Start MRI Analysis  →",
+            type="primary",
+            use_container_width=True,
+            on_click=navigate_to,
+            args=("MRI Analysis",),
+        )
+    with info_col:
+        st.markdown(
+            '<div class="important-note"><strong>Designed for clarity.</strong> Important model outputs, research warnings, and result summaries are now placed on high-contrast white or pink clinical surfaces.</div>',
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("### What the system does")
+    feature_cols = st.columns(4, gap="medium")
+    features = [
+        ("MRI", "MRI Classification", "Upload one brain MRI scan and classify it into one of four trained categories."),
+        ("AI", "DenseNet121", "Uses ImageNet transfer learning with selective fine-tuning for MRI feature extraction."),
+        ("%", "Confidence Review", "Shows the complete four-class probability distribution instead of only one label."),
+        ("◎", "Grad-CAM", "Highlights image regions that influenced the model's decision for interpretability."),
     ]
-    for column, (title, description) in zip(columns, cards):
+    for column, (icon, title, copy) in zip(feature_cols, features):
         with column:
             st.markdown(
-                f'<div class="feature-card"><h4>{title}</h4><p class="muted">{description}</p></div>',
+                f"""
+                <div class="clinical-card">
+                    <div class="feature-icon">{icon}</div>
+                    <div class="feature-title">{title}</div>
+                    <div class="feature-copy">{copy}</div>
+                </div>
+                """,
                 unsafe_allow_html=True,
             )
 
-    st.subheader("Project workflow")
-    st.code(
-        "Brain MRI Dataset → Image Preprocessing → Data Augmentation → DenseNet121 → "
-        "Transfer Learning → Fine-Tuning → Classification → Model Evaluation → "
-        "MRI Prediction → Grad-CAM Explanation",
-        language=None,
-    )
+    st.markdown("### Model snapshot")
+    metrics_cols = st.columns(4)
+    metrics_cols[0].metric("Architecture", "DenseNet121")
+    metrics_cols[1].metric("MRI categories", "4")
+    if isinstance(accuracy, (int, float)):
+        metrics_cols[2].metric("Test accuracy", f"{accuracy * 100:.2f}%")
+    else:
+        metrics_cols[2].metric("Test accuracy", "Pending")
+    test_images = metrics.get("number_of_test_images")
+    metrics_cols[3].metric("Held-out test images", str(test_images) if test_images is not None else "Pending")
+
+    st.markdown("### How an MRI becomes a result")
+    workflow_left, workflow_right = st.columns([1.1, .9], gap="large")
+    with workflow_left:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="step"><span class="step-number">1</span><div><strong>Upload MRI</strong><br><small>JPG, JPEG, or PNG input is validated and converted to RGB.</small></div></div>
+                <div class="step"><span class="step-number">2</span><div><strong>Preprocess</strong><br><small>The scan is resized to 224×224 and prepared with DenseNet preprocessing.</small></div></div>
+                <div class="step"><span class="step-number">3</span><div><strong>Classify</strong><br><small>DenseNet121 produces probabilities for Glioma, Meningioma, No Tumor, and Pituitary Tumor.</small></div></div>
+                <div class="step"><span class="step-number">4</span><div><strong>Explain</strong><br><small>Grad-CAM visualizes influential regions in the model's decision.</small></div></div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with workflow_right:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Research safeguards</div>
+                <h3 style="margin:.8rem 0 .55rem;">Clear medical-AI boundaries</h3>
+                <div class="feature-copy" style="font-size:.96rem;">
+                    The interface deliberately uses wording such as <strong>model classification</strong>,
+                    <strong>model confidence</strong>, and <strong>Grad-CAM influence</strong> rather than presenting results as a medical diagnosis.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     render_disclaimer()
 
 
 def render_analysis() -> None:
-    st.title("MRI Analysis")
-    st.caption("Upload one JPG, JPEG, or PNG image. The model output is an educational classification, not a diagnosis.")
+    render_page_header(
+        "MRI Analysis",
+        "Upload a brain MRI scan, review the model classification and full probability distribution, then inspect Grad-CAM explanation maps.",
+        "MRI Inference Workspace",
+    )
 
     if not MODEL_PATH.is_file():
-        st.warning(
-            "No trained model is available. Train the DenseNet121 model first.\n\n"
-            "Run: `python -m src.train`"
-        )
+        st.warning("No trained DenseNet model is available. Train the model with `python -m src.train` before using MRI analysis.")
         render_disclaimer()
         return
 
-    uploaded = st.file_uploader("Upload a brain MRI image", type=["jpg", "jpeg", "png"])
+    left, right = st.columns([1.1, .9], gap="large")
+    with left:
+        st.markdown("#### Upload MRI scan")
+        uploaded = st.file_uploader(
+            "Choose a JPG, JPEG, or PNG MRI image",
+            type=["jpg", "jpeg", "png"],
+            help="No patient-identifying information is required or stored by this project.",
+        )
+    with right:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Before analysis</div>
+                <h4 style="margin:.8rem 0 .5rem;">What the model returns</h4>
+                <div class="feature-copy">
+                    • Predicted MRI category<br>
+                    • Model confidence<br>
+                    • Four-class probability distribution<br>
+                    • Grad-CAM heatmap and overlay<br>
+                    • Downloadable educational report
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     if uploaded is None:
-        st.info("Choose an MRI image to begin. No prediction is generated until you click **Analyze MRI**.")
+        st.info("Choose an MRI image to begin. The model will not run until you click **Analyze MRI**.")
         render_disclaimer()
         return
 
     image_bytes = uploaded.getvalue()
     try:
         preview = load_rgb_image(image_bytes)
-        st.image(preview, caption="MRI preview", width=420)
     except ValueError as exc:
         st.error(str(exc))
         return
 
-    if st.button("Analyze MRI", type="primary", use_container_width=True):
+    preview_col, action_col = st.columns([1.05, .95], gap="large")
+    with preview_col:
+        st.markdown("#### MRI preview")
+        st.image(preview, caption=f"Selected image · {uploaded.name}", use_container_width=True)
+    with action_col:
+        st.markdown(
+            '<div class="important-note"><strong>Ready for analysis.</strong><br>The image has been validated and prepared for DenseNet121 preprocessing.</div>',
+            unsafe_allow_html=True,
+        )
+        analyze_clicked = st.button("Analyze MRI", type="primary", use_container_width=True)
+
+    if analyze_clicked:
         try:
             with st.spinner("Running DenseNet121 classification and Grad-CAM analysis..."):
                 model = get_cached_model(str(MODEL_PATH), MODEL_PATH.stat().st_mtime_ns)
                 result = analyze_mri(image_bytes, model)
-                original, heatmap, overlay = create_heatmap_images(
-                    image_bytes, model, result["class_index"]
-                )
+                original, heatmap, overlay = create_heatmap_images(image_bytes, model, result["class_index"])
         except (ValueError, RuntimeError, FileNotFoundError) as exc:
             st.error(f"Analysis could not be completed: {exc}")
             return
@@ -154,10 +773,16 @@ def render_analysis() -> None:
             return
 
         timestamp = datetime.now().astimezone()
-        st.markdown("### Model classification")
-        left, right = st.columns(2)
-        left.metric("Predicted MRI category", result["predicted_class"])
-        right.metric("Model confidence", f"{result['confidence'] * 100:.2f}%")
+
+        st.markdown("### Model result")
+        result_left, result_right = st.columns(2)
+        result_left.metric("Predicted MRI category", result["predicted_class"])
+        result_right.metric("Model confidence", f"{result['confidence'] * 100:.2f}%")
+
+        st.markdown(
+            '<div class="important-note"><strong>Interpretation note:</strong> Confidence is the model\'s softmax probability for its selected category. It is not a measure of medical certainty.</div>',
+            unsafe_allow_html=True,
+        )
 
         probability_frame = pd.DataFrame(
             {
@@ -165,19 +790,15 @@ def render_analysis() -> None:
                 "Probability (%)": [value * 100 for value in result["probabilities"].values()],
             }
         )
-        st.subheader("Probability distribution")
-        chart = px.bar(
-            probability_frame,
-            x="Probability (%)",
-            y="MRI category",
-            orientation="h",
-            range_x=[0, 100],
-        )
-        chart.update_layout(height=340, margin=dict(l=10, r=10, t=20, b=10))
-        st.plotly_chart(chart, use_container_width=True)
+        st.markdown("### Probability distribution")
+        st.plotly_chart(build_probability_chart(probability_frame), use_container_width=True)
 
-        st.subheader("Grad-CAM explainability")
-        image_columns = st.columns(3)
+        st.markdown("### Grad-CAM explainability")
+        st.markdown(
+            '<div class="section-intro">Compare the original scan with the activation heatmap and overlay. Brighter regions indicate areas that contributed more strongly to the network output.</div>',
+            unsafe_allow_html=True,
+        )
+        image_columns = st.columns(3, gap="medium")
         image_columns[0].image(original, caption="Original MRI", use_container_width=True)
         image_columns[1].image(heatmap, caption="Grad-CAM heatmap", use_container_width=True)
         image_columns[2].image(overlay, caption="Heatmap overlay", use_container_width=True)
@@ -201,46 +822,90 @@ def render_analysis() -> None:
         )
 
     if st.session_state.get("prediction_history"):
-        st.subheader("Current-session prediction history")
-        st.dataframe(pd.DataFrame(st.session_state["prediction_history"]), use_container_width=True, hide_index=True)
+        with st.expander("Current-session prediction history", expanded=False):
+            st.dataframe(
+                pd.DataFrame(st.session_state["prediction_history"]),
+                use_container_width=True,
+                hide_index=True,
+            )
+
     render_disclaimer()
 
 
 def render_model_information() -> None:
-    st.title("Model Information")
+    render_page_header(
+        "Model Information",
+        "A concise technical view of the architecture, transfer-learning strategy, input requirements, and output categories used by the MRI classifier.",
+        "DenseNet121 Architecture",
+    )
+
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Architecture", "DenseNet121")
-    c2.metric("Learning", "Transfer Learning")
+    c2.metric("Learning method", "Transfer Learning")
     c3.metric("Pretraining", "ImageNet")
     c4.metric("Input", "224 × 224 RGB")
 
-    st.subheader("What is DenseNet?")
-    st.write(
-        "DenseNet connects each layer to subsequent layers, allowing efficient feature reuse and improved gradient flow. "
-        "DenseNet121 is a 121-layer variant used here as the principal image-feature extractor."
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Architecture</div>
+                <h3 style="margin:.8rem 0 .55rem;">Why DenseNet121?</h3>
+                <div class="feature-copy">
+                    DenseNet connects layers densely so later layers can reuse earlier feature maps.
+                    This improves feature reuse and gradient flow while keeping the classification head compact.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with right:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Training strategy</div>
+                <h3 style="margin:.8rem 0 .55rem;">Two-stage transfer learning</h3>
+                <div class="feature-copy">
+                    Stage 1 freezes the DenseNet121 backbone and trains the custom head. Stage 2 selectively
+                    unfreezes upper layers and fine-tunes them with a much smaller learning rate.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.markdown("### Processing pipeline")
+    st.markdown(
+        """
+        <div class="clinical-card">
+            <div class="step"><span class="step-number">1</span><div><strong>Input</strong><br><small>Brain MRI image in JPG, JPEG, or PNG format.</small></div></div>
+            <div class="step"><span class="step-number">2</span><div><strong>Standardization</strong><br><small>RGB conversion, 224×224 resize, and DenseNet preprocessing.</small></div></div>
+            <div class="step"><span class="step-number">3</span><div><strong>Feature extraction</strong><br><small>ImageNet-pretrained DenseNet121 convolutional backbone.</small></div></div>
+            <div class="step"><span class="step-number">4</span><div><strong>Classification</strong><br><small>Four-unit softmax output for Glioma, Meningioma, No Tumor, and Pituitary Tumor.</small></div></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    st.subheader("Why transfer learning?")
-    st.write(
-        "Instead of learning every visual feature from scratch, the project starts from ImageNet-pretrained DenseNet121 weights. "
-        "The custom classification head is trained first, then selected upper DenseNet layers are fine-tuned at a lower learning rate."
+
+    st.markdown("### Output classes")
+    st.markdown(
+        '<div class="important-note"><strong>Glioma</strong> &nbsp;•&nbsp; <strong>Meningioma</strong> &nbsp;•&nbsp; <strong>No Tumor</strong> &nbsp;•&nbsp; <strong>Pituitary Tumor</strong></div>',
+        unsafe_allow_html=True,
     )
-    st.subheader("Why 224 × 224?")
-    st.write(
-        "The project standardizes MRI inputs to 224 × 224 pixels with three RGB channels, matching the expected DenseNet121 input format "
-        "and keeping training/inference preprocessing consistent."
-    )
-    st.subheader("Output classes")
-    st.write("Glioma · Meningioma · No Tumor · Pituitary Tumor")
     render_disclaimer()
 
 
 def render_performance() -> None:
-    st.title("Performance")
+    render_page_header(
+        "Model Performance",
+        "Evaluation metrics and plots shown here are loaded from the real artifacts produced by the held-out Testing split.",
+        "Evaluation Dashboard",
+    )
+
     metrics = read_json(EVALUATION_METRICS_PATH)
     if metrics is None:
-        st.info(
-            "Model evaluation results will appear after training and evaluation. Run `python -m src.train`, then `python -m src.evaluate`."
-        )
+        st.info("Model evaluation results will appear after running `python -m src.evaluate`.")
     else:
         columns = st.columns(4)
         values = [
@@ -251,57 +916,150 @@ def render_performance() -> None:
         ]
         for column, (label, value) in zip(columns, values):
             column.metric(label, f"{value * 100:.2f}%" if isinstance(value, (int, float)) else "N/A")
-        if metrics.get("number_of_test_images") is not None:
-            st.caption(f"Calculated from {metrics['number_of_test_images']} testing images.")
 
-    for filename, caption in (
+        if metrics.get("number_of_test_images") is not None:
+            st.markdown(
+                f'<div class="important-note"><strong>Evaluation population:</strong> {metrics["number_of_test_images"]} held-out testing images.</div>',
+                unsafe_allow_html=True,
+            )
+
+        auc_values = metrics.get("one_vs_rest_auc")
+        if isinstance(auc_values, dict) and auc_values:
+            auc_frame = pd.DataFrame(
+                {"Class": list(auc_values.keys()), "AUC": list(auc_values.values())}
+            )
+            with st.expander("View one-vs-rest AUC values", expanded=False):
+                st.dataframe(auc_frame, use_container_width=True, hide_index=True)
+
+    st.markdown("### Evaluation visuals")
+    plots = [
         ("training_accuracy.png", "Training and validation accuracy"),
         ("training_loss.png", "Training and validation loss"),
         ("confusion_matrix.png", "Confusion matrix"),
         ("class_wise_metrics.png", "Class-wise precision, recall, and F1"),
         ("roc_curves.png", "One-vs-rest ROC curves"),
-    ):
-        path = PLOTS_DIR / filename
-        if path.is_file():
-            st.image(str(path), caption=caption, use_container_width=True)
+    ]
+    available = [(PLOTS_DIR / filename, caption) for filename, caption in plots if (PLOTS_DIR / filename).is_file()]
+    if available:
+        for index in range(0, len(available), 2):
+            cols = st.columns(2, gap="large")
+            for col, item in zip(cols, available[index:index + 2]):
+                path, caption = item
+                with col:
+                    st.image(str(path), caption=caption, use_container_width=True)
+    else:
+        st.info("Evaluation plots will appear here after training/evaluation artifacts are generated.")
 
     report = read_json(CLASSIFICATION_REPORT_PATH)
     if report:
         rows = []
         for class_name in ("glioma", "meningioma", "notumor", "pituitary"):
             if class_name in report:
-                rows.append({"class": class_name, **report[class_name]})
+                rows.append({"Class": class_name.title(), **report[class_name]})
         if rows:
-            st.subheader("Classification report")
+            st.markdown("### Class-wise report")
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
     render_disclaimer()
 
 
 def render_about() -> None:
-    st.title("About Project")
-    st.write(
-        "This college project demonstrates the complete deep-learning lifecycle for four-class brain MRI image classification: "
-        "dataset inspection, preprocessing, conservative augmentation, DenseNet121 transfer learning, selective fine-tuning, "
-        "evaluation, prediction, and Grad-CAM explainability."
+    render_page_header(
+        "About the Project",
+        "A complete academic deep-learning lifecycle for brain MRI image classification — from dataset validation and preprocessing to evaluation, prediction, and explainability.",
+        "Academic Medical-AI Project",
     )
+
+    left, right = st.columns([1.1, .9], gap="large")
+    with left:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Project scope</div>
+                <h3 style="margin:.8rem 0 .55rem;">What this project demonstrates</h3>
+                <div class="feature-copy">
+                    Dataset inspection, conservative augmentation, DenseNet121 transfer learning, selective fine-tuning,
+                    held-out evaluation, reusable prediction, Streamlit deployment, and Grad-CAM explainability.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with right:
+        st.markdown(
+            """
+            <div class="clinical-card">
+                <div class="eyebrow">Author</div>
+                <h3 style="margin:.8rem 0 .55rem;">Archi Sharma</h3>
+                <div class="feature-copy">GitHub · <strong>archisharma158-cmd</strong><br>Brain Tumor Detection using DenseNet121</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
     stats = read_json(DATASET_STATS_PATH)
     if stats:
-        st.subheader("Dataset statistics generated from your local dataset")
-        st.json(stats)
+        st.markdown("### Dataset snapshot")
+        s1, s2, s3 = st.columns(3)
+        s1.metric("Training images", stats.get("total_images", "N/A"))
+        s2.metric("Classes", stats.get("number_of_classes", "N/A"))
+        corrupt = stats.get("corrupted_files")
+        s3.metric("Corrupted files", len(corrupt) if isinstance(corrupt, list) else "N/A")
+        with st.expander("View complete generated dataset statistics", expanded=False):
+            st.json(stats)
     else:
-        st.info("Dataset statistics will appear after EDA/training is run on an actual dataset.")
-    st.subheader("Author")
-    st.write("**Archi Sharma**")
-    st.write("GitHub: `archisharma158-cmd`")
+        st.info("Dataset statistics appear here after EDA/training has generated them.")
+
     render_disclaimer()
 
 
+# -----------------------------------------------------------------------------
+# Navigation
+# -----------------------------------------------------------------------------
+PAGES = ("Home", "MRI Analysis", "Model Information", "Performance", "About Project")
+PAGE_LABELS = {
+    "Home": "⌂  Home",
+    "MRI Analysis": "✚  MRI Analysis",
+    "Model Information": "◫  Model Information",
+    "Performance": "◔  Performance",
+    "About Project": "ⓘ  About Project",
+}
+
+if "nav_page" not in st.session_state:
+    st.session_state["nav_page"] = "Home"
+
+st.sidebar.markdown(
+    """
+    <div style="padding:.45rem .2rem 1.1rem;">
+        <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#EC4899,#DB2777);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.7rem;">🧠</div>
+        <div style="font-size:1.12rem;font-weight:850;line-height:1.15;">Brain MRI AI</div>
+        <div style="font-size:.78rem;color:#B9CCDC;margin-top:.25rem;">DenseNet121 Research Workspace</div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 page = st.sidebar.radio(
     "Navigation",
-    ("Home", "MRI Analysis", "Model Information", "Performance", "About Project"),
+    PAGES,
+    key="nav_page",
+    format_func=lambda item: PAGE_LABELS[item],
+    label_visibility="collapsed",
 )
+
 st.sidebar.markdown("---")
-st.sidebar.caption("DenseNet121 · TensorFlow/Keras · Streamlit · Grad-CAM")
+model_sidebar_status = "Ready" if MODEL_PATH.is_file() else "Not trained"
+st.sidebar.markdown(
+    f"""
+    <div style="font-size:.78rem;color:#B9CCDC;line-height:1.7;">
+        <strong style="color:white;">System status</strong><br>
+        Model · {model_sidebar_status}<br>
+        Architecture · DenseNet121<br>
+        Explainability · Grad-CAM
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 if page == "Home":
     render_home()
