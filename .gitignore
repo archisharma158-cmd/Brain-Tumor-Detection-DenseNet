@@ -1,0 +1,32 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+
+# Secrets / local environment
+.env
+.env.*
+*.env
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Dataset and trained model artifacts
+dataset/
+models/*.keras
+models/*.h5
+
+# Generated metrics (re-created from real runs)
+results/*.json
+
+# OS / IDE / logs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
