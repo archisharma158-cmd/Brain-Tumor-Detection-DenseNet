@@ -1,380 +1,916 @@
-<p align="center">
-  <img src="app/assets/logo.png" alt="Brain Tumor Detection Logo" width="180" />
-</p>
+<div align="center">
 
-# Brain Tumor Detection using DenseNet121
+<img src="app/assets/logo.png" alt="Brain Tumor Detection Logo" width="175"/>
 
-![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16%2B-FF6F00?logo=tensorflow&logoColor=white)
-![Keras](https://img.shields.io/badge/Keras-DenseNet121-D00000?logo=keras&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-FF4B4B?logo=streamlit&logoColor=white)
-![Deep Learning](https://img.shields.io/badge/Deep%20Learning-Transfer%20Learning-0A66C2)
-![Computer Vision](https://img.shields.io/badge/Computer%20Vision-MRI%20Classification-00A8CC)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+# 🧠 Brain Tumor Detection & Classification
 
-A complete academic deep-learning pipeline for classifying brain MRI scans into **Glioma**, **Meningioma**, **Pituitary Tumor**, or **No Tumor** using **DenseNet121 transfer learning**, featuring robust dataset discovery, an academic Jupyter notebook, evaluation tooling, a Streamlit web application, and **Grad-CAM** visual explainability.
+### DenseNet121 • Brain MRI Classification • Grad-CAM Explainability
 
-> [!CAUTION]
-> **Medical Disclaimer:** This system is developed strictly for educational and research purposes. It does not provide medical advice, does not perform tumor localization with clinical certainty, and must not be used to replace professional diagnosis by certified radiologists or medical oncologists.
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=600&size=21&duration=2800&pause=900&color=2563EB&center=true&vCenter=true&width=750&lines=AI-Powered+Brain+MRI+Classification;DenseNet121+Transfer+Learning;Grad-CAM+Visual+Explainability;Interactive+Clinical-Inspired+Streamlit+Interface" alt="Typing SVG" />
 
----
+<br>
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Dataset & Download](#dataset--download)
-3. [Accepted Dataset Folder Structures](#accepted-dataset-folder-structures)
-4. [Windows Quick-Start Guide](#windows-quick-start-guide)
-5. [Jupyter Notebook Workflow (29 Steps)](#jupyter-notebook-workflow)
-6. [Dataset Verification](#dataset-verification)
-7. [Command-Line Execution](#command-line-execution)
-   - [Training Pipeline](#1-training-pipeline)
-   - [Model Evaluation](#2-model-evaluation)
-   - [Single Image Prediction](#3-single-image-prediction)
-   - [Streamlit Web Interface](#4-streamlit-web-interface)
-8. [DenseNet121 Architecture](#densenet121-architecture)
-9. [Grad-CAM Explainability](#grad-cam-explainability)
-10. [Troubleshooting Guide](#troubleshooting-guide)
-11. [Unit Tests](#unit-tests)
-12. [Project Structure](#project-structure)
-13. [Viva Voce Q&A Preparation](#viva-voce-qa-preparation)
+[![Live Demo](https://img.shields.io/badge/🚀_LIVE_DEMO-Open_Application-EC4899?style=for-the-badge)](https://brain-tumor-detection-ai-158.streamlit.app/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-0D1117?style=for-the-badge&logo=github)](https://github.com/archisharma158-cmd/Brain-Tumor-Detection-DenseNet)
+
+<br>
+
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.20.0-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)
+![Keras](https://img.shields.io/badge/Keras-DenseNet121-D00000?style=flat-square&logo=keras&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-Deployed-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-Grad--CAM-5C3EE8?style=flat-square&logo=opencv&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Live-16A34A?style=flat-square)
+
+</div>
 
 ---
 
-## Project Overview
+## 🌐 Live Application
 
-This project implements a reproducible, college-level deep learning lifecycle for brain MRI classification. Rather than just wrapping pre-existing models or fabricating performance metrics, every result—from exploratory data analysis (EDA) to training curves, confusion matrices, ROC curves, and Grad-CAM overlays—is computed strictly from real data on disk.
+The complete project is deployed and can be tested directly online:
 
-No model accuracy, confidence percentage, confusion matrix, or Grad-CAM heatmap is hard-coded or fabricated.
+### 👉 [Launch Brain Tumor Detection AI](https://brain-tumor-detection-ai-158.streamlit.app/)
 
----
+Upload a supported brain MRI image to:
 
-## Dataset & Download
+- classify the MRI into one of four categories,
+- view model confidence and class probabilities,
+- inspect the model's attention using Grad-CAM,
+- explore model architecture and performance,
+- and download a generated prediction report.
 
-The model is designed for the **Brain Tumor MRI Dataset** by **Masoud Nickparvar** on Kaggle:
-- **Kaggle Link:** [https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset](https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset)
-- **Modality:** T1-weighted contrast-enhanced brain MRI images.
-- **Classes:** 
-  1. `glioma` (Glioma)
-  2. `meningioma` (Meningioma)
-  3. `notumor` (No Tumor)
-  4. `pituitary` (Pituitary Tumor)
-
-The large image dataset is intentionally **not** committed to Git (it is ignored via `.gitignore`). Please download and extract it locally.
+> [!IMPORTANT]
+> **Medical Disclaimer:**  
+> This system is developed for educational and research purposes only and is not intended to replace professional medical diagnosis.
 
 ---
 
-## Accepted Dataset Folder Structures
+## 📌 Table of Contents
 
-The built-in dataset discovery engine (`src/dataset_utils.py`) automatically discovers your dataset in either of the following structures:
+- [Project Overview](#-project-overview)
+- [Problem Statement](#-problem-statement)
+- [Live Application](#-live-application)
+- [Model Performance](#-model-performance)
+- [Key Features](#-key-features)
+- [How It Works](#-how-it-works)
+- [Architecture](#-architecture)
+- [Technology Stack](#-technology-stack)
+- [Dataset](#-dataset)
+- [Dataset Structure](#-dataset-structure)
+- [Preprocessing](#-preprocessing)
+- [Training Strategy](#-training-strategy)
+- [Grad-CAM Explainability](#-grad-cam-explainability)
+- [Streamlit Application](#-streamlit-application)
+- [Installation](#-installation)
+- [Running the Project](#-running-the-project)
+- [Jupyter Notebook Workflow](#-jupyter-notebook-workflow)
+- [Project Structure](#-project-structure)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Limitations](#-limitations)
+- [Future Improvements](#-future-improvements)
+- [Author](#-author)
+- [License](#-license)
 
-### Structure 1 — Standard Layout (Recommended)
+---
+
+# 🔬 Project Overview
+
+This project presents an end-to-end deep learning system for **brain tumor classification from MRI images** using **DenseNet121 transfer learning**.
+
+The system classifies MRI scans into four categories:
+
+| Class | Description |
+|---|---|
+| 🧠 **Glioma** | Tumor originating from glial cells |
+| 🧠 **Meningioma** | Tumor arising from the meninges |
+| ✅ **No Tumor** | MRI without a tumor from the dataset class |
+| 🧠 **Pituitary Tumor** | Tumor affecting the pituitary gland |
+
+The project covers the complete machine-learning lifecycle:
+
 ```text
-Brain-Tumor-Detection-DenseNet/
-└── dataset/
+MRI Dataset
+     ↓
+Dataset Validation
+     ↓
+Exploratory Data Analysis
+     ↓
+Image Preprocessing
+     ↓
+Data Augmentation
+     ↓
+DenseNet121 Transfer Learning
+     ↓
+Selective Fine-Tuning
+     ↓
+Held-Out Test Evaluation
+     ↓
+MRI Classification
+     ↓
+Grad-CAM Explainability
+     ↓
+Interactive Streamlit Application
+     ↓
+Cloud Deployment
+```
+
+The objective is not only to produce a prediction, but also to make the model pipeline **reproducible, explainable, testable, and accessible through a real web interface**.
+
+---
+
+# 🎯 Problem Statement
+
+Manual interpretation of medical imaging requires trained specialists and careful clinical evaluation.
+
+This academic project explores how deep learning can be used to analyze brain MRI images and distinguish between common MRI categories using a pretrained convolutional neural network.
+
+The project focuses on:
+
+- multi-class MRI classification,
+- transfer learning,
+- model fine-tuning,
+- held-out test evaluation,
+- prediction confidence visualization,
+- and explainable AI using Grad-CAM.
+
+The system is **not designed for clinical diagnosis** and should be treated as an educational AI implementation.
+
+---
+
+# 📊 Model Performance
+
+The final DenseNet121 model was evaluated on a **held-out test set of 400 MRI images**.
+
+| Metric | Result |
+|---|---:|
+| **Test Accuracy** | **91.50%** |
+| **Macro Precision** | **91.93%** |
+| **Macro Recall** | **91.50%** |
+| **Macro F1-Score** | **91.25%** |
+
+### One-vs-Rest ROC-AUC
+
+| MRI Class | AUC |
+|---|---:|
+| Glioma | **0.9907** |
+| Meningioma | **0.9716** |
+| No Tumor | **0.9996** |
+| Pituitary Tumor | **0.9947** |
+
+> These values come from the held-out test evaluation and should be interpreted as performance on this dataset, not as evidence of clinical diagnostic performance.
+
+---
+
+# ✨ Key Features
+
+### 🧠 DenseNet121 Transfer Learning
+Uses an ImageNet-pretrained DenseNet121 backbone for efficient feature extraction from MRI images.
+
+### 🔄 Two-Stage Training
+The network is trained using:
+
+1. **Feature Extraction**
+   - DenseNet121 backbone frozen
+   - custom classification head trained
+
+2. **Selective Fine-Tuning**
+   - upper DenseNet layers unfrozen
+   - lower learning rate used for refinement
+
+### 🔍 Grad-CAM Explainability
+Generates real gradient-based activation maps showing which regions influenced a model prediction.
+
+### 📊 Complete Evaluation
+Includes:
+
+- accuracy,
+- macro precision,
+- macro recall,
+- macro F1-score,
+- classification report,
+- confusion matrix,
+- class-wise metrics,
+- ROC curves,
+- AUC scores.
+
+### 🖼️ MRI Prediction
+Users can upload a brain MRI through the Streamlit interface and receive:
+
+- predicted class,
+- confidence score,
+- probability distribution,
+- Grad-CAM visualization.
+
+### 📄 Prediction Reports
+The application can generate structured information for individual MRI analyses.
+
+### 🧪 Dataset Validation
+The project automatically checks:
+
+- dataset availability,
+- expected directory structure,
+- class folders,
+- image extensions,
+- folder aliases.
+
+### 🌐 Deployed Web Application
+The complete inference system is available through Streamlit Community Cloud.
+
+---
+
+# ⚙️ How It Works
+
+```mermaid
+flowchart LR
+    A[Brain MRI] --> B[RGB Conversion]
+    B --> C[Resize 224 × 224]
+    C --> D[DenseNet Preprocessing]
+    D --> E[DenseNet121]
+    E --> F[Global Average Pooling]
+    F --> G[Batch Normalization]
+    G --> H[Dense 256 + ReLU]
+    H --> I[Dropout]
+    I --> J[Softmax]
+    J --> K[4-Class Prediction]
+    E --> L[Grad-CAM]
+    L --> M[Attention Visualization]
+```
+
+---
+
+# 🧠 Architecture
+
+The model uses **DenseNet121** as its feature extractor.
+
+```text
+Input MRI
+224 × 224 × 3
+        │
+        ▼
+┌─────────────────────────┐
+│ DenseNet121             │
+│ ImageNet Pretrained     │
+│ include_top = False     │
+└─────────────────────────┘
+        │
+        ▼
+GlobalAveragePooling2D
+        │
+        ▼
+BatchNormalization
+        │
+        ▼
+Dense(256, ReLU)
+L2 Regularization
+        │
+        ▼
+Dropout(0.35)
+        │
+        ▼
+Dense(4, Softmax)
+        │
+        ▼
+MRI Classification
+```
+
+### Why DenseNet121?
+
+DenseNet creates direct connections between layers, allowing later layers to reuse earlier feature representations.
+
+This helps with:
+
+- feature reuse,
+- gradient flow,
+- parameter efficiency,
+- transfer learning,
+- medical-image feature extraction.
+
+---
+
+# 🛠️ Technology Stack
+
+| Area | Technology |
+|---|---|
+| Programming | Python |
+| Deep Learning | TensorFlow 2.20 / Keras |
+| Architecture | DenseNet121 |
+| Image Processing | OpenCV, Pillow |
+| Numerical Computing | NumPy |
+| Data Analysis | Pandas |
+| Machine Learning Metrics | Scikit-learn |
+| Visualization | Matplotlib, Plotly |
+| Explainability | Grad-CAM |
+| Web Interface | Streamlit |
+| Testing | Pytest |
+| Notebook | Jupyter |
+| Deployment | Streamlit Community Cloud |
+| Version Control | Git + GitHub |
+
+---
+
+# 🗂️ Dataset
+
+The project uses the **Brain Tumor MRI Dataset by Masoud Nickparvar** available on Kaggle.
+
+### Dataset
+
+**Brain Tumor MRI Dataset**
+
+https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset
+
+### Classes
+
+```text
+glioma
+meningioma
+notumor
+pituitary
+```
+
+The dataset itself is not committed to this repository because of its size.
+
+---
+
+# 📁 Dataset Structure
+
+Recommended structure:
+
+```text
+dataset/
+├── Training/
+│   ├── glioma/
+│   ├── meningioma/
+│   ├── notumor/
+│   └── pituitary/
+│
+└── Testing/
+    ├── glioma/
+    ├── meningioma/
+    ├── notumor/
+    └── pituitary/
+```
+
+The project also supports the nested Kaggle structure:
+
+```text
+dataset/
+└── Brain Tumor MRI Dataset/
     ├── Training/
-    │   ├── glioma/
-    │   ├── meningioma/
-    │   ├── notumor/
-    │   └── pituitary/
     └── Testing/
-        ├── glioma/
-        ├── meningioma/
-        ├── notumor/
-        └── pituitary/
 ```
 
-### Structure 2 — Nested Kaggle Archive Layout
-```text
-Brain-Tumor-Detection-DenseNet/
-└── dataset/
-    └── Brain Tumor MRI Dataset/
-        ├── Training/
-        │   ├── glioma/
-        │   ├── meningioma/
-        │   ├── notumor/
-        │   └── pituitary/
-        └── Testing/
-            ├── glioma/
-            ├── meningioma/
-            ├── notumor/
-            └── pituitary/
-```
+Custom locations can be supplied using:
 
-### Structure 3 — Custom Location via Environment Variable
-Set `BRAIN_TUMOR_DATASET_DIR`:
 ```powershell
 $env:BRAIN_TUMOR_DATASET_DIR = "D:\Datasets\Brain Tumor MRI Dataset"
 ```
 
-The system automatically recognizes case variations (e.g. `Glioma`, `Meningioma`, `No Tumor`, `no_tumor`, `pituitary_tumor`) while strictly maintaining the canonical internal class order:
-`("glioma", "meningioma", "notumor", "pituitary")`.
+The dataset resolver also handles class-name variations such as:
+
+```text
+Glioma
+No Tumor
+no_tumor
+pituitary_tumor
+```
+
+while maintaining the canonical internal order:
+
+```python
+("glioma", "meningioma", "notumor", "pituitary")
+```
 
 ---
 
-## Windows Quick-Start Guide
+# 🖼️ Preprocessing
 
-Follow these step-by-step commands in **Windows PowerShell**:
+Every image passes through a consistent preprocessing pipeline.
 
-### 1. Clone Repository & Navigate
-```powershell
+```text
+Input MRI
+   ↓
+Load image
+   ↓
+Convert to RGB
+   ↓
+Resize to 224 × 224
+   ↓
+Convert to float tensor
+   ↓
+DenseNet preprocess_input()
+   ↓
+Model input
+```
+
+Supported formats:
+
+```text
+.jpg
+.jpeg
+.png
+```
+
+Training data additionally uses conservative image augmentation to improve generalization.
+
+---
+
+# 🏋️ Training Strategy
+
+Training is divided into two stages.
+
+## Stage 1 — Feature Extraction
+
+The pretrained DenseNet121 backbone remains frozen.
+
+```text
+Initial Learning Rate: 1e-3
+Initial Epochs: 12
+```
+
+Only the custom classification head is trained.
+
+---
+
+## Stage 2 — Fine-Tuning
+
+The upper DenseNet121 layers are selectively unfrozen.
+
+```text
+Fine-Tuning Layers: 40
+Fine-Tuning Learning Rate: 1e-5
+Fine-Tuning Epochs: 8
+```
+
+Batch Normalization layers remain protected during fine-tuning to avoid destabilizing pretrained statistics.
+
+Training uses callbacks including:
+
+- `EarlyStopping`
+- `ModelCheckpoint`
+- `ReduceLROnPlateau`
+
+The final selected model is stored as:
+
+```text
+models/best_densenet121.keras
+```
+
+---
+
+# 🔥 Grad-CAM Explainability
+
+The application includes **Gradient-weighted Class Activation Mapping (Grad-CAM)**.
+
+Grad-CAM computes gradients of the predicted class score with respect to convolutional feature maps.
+
+\[
+\alpha_k^c =
+\frac{1}{Z}
+\sum_i
+\sum_j
+\frac{\partial y^c}
+{\partial A_{i,j}^{k}}
+\]
+
+The class activation map is then calculated as:
+
+\[
+L_{\text{Grad-CAM}}^c =
+ReLU
+\left(
+\sum_k \alpha_k^c A^k
+\right)
+\]
+
+The resulting map is resized and overlaid on the original MRI.
+
+### Important
+
+Grad-CAM shows regions that **influenced the neural network's prediction**.
+
+It does **not** medically localize or segment a tumor and should not be interpreted as a clinical diagnostic map.
+
+---
+
+# 🖥️ Streamlit Application
+
+The project includes a custom clinical-inspired Streamlit interface.
+
+### Application Pages
+
+#### 🏠 Home
+Provides:
+
+- project overview,
+- workflow,
+- model status,
+- main capabilities.
+
+#### 🔬 MRI Analysis
+Allows users to:
+
+- upload MRI images,
+- run model inference,
+- inspect predicted class,
+- inspect probability distribution,
+- generate Grad-CAM,
+- download prediction information.
+
+#### 🧠 Model Information
+Explains:
+
+- DenseNet121,
+- transfer learning,
+- preprocessing,
+- architecture,
+- training methodology.
+
+#### 📊 Performance
+Displays available model evaluation information and visualizations.
+
+#### ℹ️ About Project
+Provides:
+
+- project context,
+- objectives,
+- limitations,
+- educational disclaimer.
+
+---
+
+# 🚀 Installation
+
+## 1. Clone the repository
+
+```bash
 git clone https://github.com/archisharma158-cmd/Brain-Tumor-Detection-DenseNet.git
 cd Brain-Tumor-Detection-DenseNet
 ```
 
-### 2. Create and Activate Virtual Environment
+---
+
+## 2. Create a virtual environment
+
+### Windows
+
 ```powershell
 python -m venv .venv
 .venv\Scripts\activate
 ```
 
-### 3. Upgrade Pip & Install Dependencies
-```powershell
+### Linux / macOS
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+---
+
+## 3. Upgrade pip
+
+```bash
 python -m pip install --upgrade pip
+```
+
+---
+
+## 4. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 4. Register Jupyter Kernel
-Register your virtual environment kernel so it appears in VS Code and Jupyter:
-```powershell
-python -m ipykernel install --user --name brain-tumor-densenet --display-name "Brain Tumor DenseNet"
-```
-
-### 5. Select Kernel in VS Code or Jupyter
-- In **VS Code**: Open `notebooks/Brain_Tumor_DenseNet.ipynb`, click the kernel selector in the top-right corner, click **Python Environments...**, and select **Brain Tumor DenseNet** (or `.venv`).
-- In **Jupyter Notebook / Lab**: Select **Kernel → Change Kernel → Brain Tumor DenseNet**.
-
 ---
 
-## Jupyter Notebook Workflow
+# ▶️ Running the Project
 
-The academic notebook (`notebooks/Brain_Tumor_DenseNet.ipynb`) is organized into **29 clear, sequential sections**:
-
-1. **Problem Statement & Medical Disclaimer**
-2. **Environment Diagnostics & Library Imports** (Python, TensorFlow, NumPy, GPU detection)
-3. **Project Root & Path Discovery** (Dynamic parent walking)
-4. **Project and Dataset Configuration** (`DATASET_PATH` setting)
-5. **Dataset Setup and Validation Diagnostic Cell** (Counts, extensions, missing checks)
-6. **Exploratory Data Analysis (EDA)** (File-based statistics, corruption check)
-7. **Class Distribution Visualization** (Bar chart of real training counts)
-8. **Sample MRI Visualization** (Representative MRI slice per class)
-9. **Image Preprocessing Pipeline** (Original vs. RGB $224 \times 224$ vs. $[-1, 1]$ float32 tensor)
-10. **Data Augmentation** (Demonstration of conservative transformations)
-11. **Prepare Training, Validation, and Test Datasets** (`tf.data` pipeline with prefetch)
-12. **Build DenseNet121 Architecture** (Model summary, parameter counts)
-13. **Explain DenseNet121 Architecture** (Feature reuse, dense connections, mathematical intuition)
-14. **Stage 1 — Transfer Learning Setup & Execution Controls** (`RUN_TRAINING = False`, `QUICK_TEST = False`)
-15. **Train Classification Head (Stage 1 Feature Extraction)** (Frozen backbone, callbacks)
-16. **Stage 1 Training Curves** (Accuracy and loss plots)
-17. **Stage 2 — Selective Fine-Tuning Setup** (Unfreezing upper 40 layers, low learning rate)
-18. **Fine-Tuning Execution & Merged Curves** (Training with transition marker)
-19. **Final Model Selection and Checkpoint Saving** (`models/best_densenet121.keras`)
-20. **Evaluate Test Dataset** (Evaluation on held-out `Testing/`)
-21. **Accuracy, Precision, Recall, and F1-Score** (Macro-averaged summary table)
-22. **Classification Report** (Per-class precision, recall, F1, and support)
-23. **Confusion Matrix** ($4 \times 4$ heatmap with annotated counts)
-24. **One-vs-Rest ROC / AUC Analysis** (ROC curves with per-class AUC scores)
-25. **Single MRI Prediction Demo** (Ground truth, prediction, confidence, probabilities)
-26. **Probability Distribution Bar Chart** (Full softmax distribution)
-27. **Grad-CAM Explainability** (Original, heatmap, overlay + warning)
-28. **Final Results and Academic Conclusions**
-29. **Viva Voce Q&A Preparation Guide** (Common examiner questions and answers)
-
----
-
-## Dataset Verification
-
-To verify that your dataset is correctly positioned and recognized without running training or launching a notebook, run:
+## Launch the Streamlit application
 
 ```bash
-python -c "import src.dataset_utils as du; print(du.inspect_dataset_structure())"
+python -m streamlit run app/app.py
 ```
 
-Or run the standalone EDA script:
+or:
+
 ```bash
-python -m src.eda
+python run_app.py
 ```
+
+Then open the local Streamlit URL shown in the terminal.
 
 ---
 
-## Command-Line Execution
+## Train the model
 
-### 1. Training Pipeline
-Run two-stage training (Stage 1 feature extraction + Stage 2 selective fine-tuning):
 ```bash
 python -m src.train
 ```
 
-Optional arguments:
+Optional:
+
 ```bash
-python -m src.train --dataset-dir "dataset" --initial-epochs 12 --fine-tune-epochs 8 --batch-size 16
+python -m src.train \
+    --dataset-dir "dataset" \
+    --initial-epochs 12 \
+    --fine-tune-epochs 8 \
+    --batch-size 16
 ```
 
-Output checkpoints saved to:
-- `models/stage1_best.keras`
-- `models/stage2_best.keras`
-- `models/best_densenet121.keras` (Best overall model by validation loss)
+---
 
-### 2. Model Evaluation
-Evaluate the trained model on held-out test data:
+## Evaluate the model
+
 ```bash
 python -m src.evaluate
 ```
 
-This updates metrics and plots in `results/`:
-- `results/evaluation_metrics.json`
-- `results/classification_report.json`
-- `results/plots/confusion_matrix.png`
-- `results/plots/class_wise_metrics.png`
-- `results/plots/roc_curves.png`
-
-### 3. Single Image Prediction
-Predict a single MRI slice from the command line:
-```bash
-python -m src.predict sample_images/glioma_sample.jpg
-```
-
-Output format:
-```text
-Predicted MRI category: Glioma
-Model confidence: 94.21%
-Class probabilities:
-  Glioma: 94.21%
-  Meningioma: 3.12%
-  No Tumor: 1.45%
-  Pituitary Tumor: 1.22%
-```
-
-### 4. Streamlit Web Interface
-Launch the interactive web application:
-```bash
-streamlit run app/app.py
-```
-*(or run `python run_app.py`)*
-
-If `models/best_densenet121.keras` has not been trained yet, the application loads gracefully and explains how to run training rather than crashing.
-
----
-
-## DenseNet121 Architecture
+Evaluation can generate:
 
 ```text
-Input Tensor: (224, 224, 3)
-      ↓
-Pretrained DenseNet121 (ImageNet weights, include_top=False)
-      ↓
-GlobalAveragePooling2D
-      ↓
-BatchNormalization
-      ↓
-Dense (256 units, ReLU activation, L2 regularization 1e-4)
-      ↓
-Dropout (0.35 rate)
-      ↓
-Dense (4 units, Softmax activation) -> Class Probabilities
+results/evaluation_metrics.json
+results/classification_report.json
+results/plots/confusion_matrix.png
+results/plots/class_wise_metrics.png
+results/plots/roc_curves.png
 ```
 
 ---
 
-## Grad-CAM Explainability
-
-**Gradient-weighted Class Activation Mapping** computes the gradients of the predicted class score with respect to the feature activation maps of the final convolutional layer of DenseNet121 (`conv5_block16_2_conv`).
-
-$$\alpha_k^c = \frac{1}{Z} \sum_i \sum_j \frac{\partial y^c}{\partial A_{i,j}^k}$$
-$$L_{\text{Grad-CAM}}^c = \text{ReLU}\left(\sum_k \alpha_k^c A^k\right)$$
-
-The resulting activation map is upsampled to $224 \times 224$, color-mapped using the Jet colormap, and blended over the original grayscale MRI slice.
-
-> **Note:** Grad-CAM illustrates regions influencing network decisions; it is an interpretive visual aid, not a clinical tumor segmentation tool.
-
----
-
-## Troubleshooting Guide
-
-| Issue / Error | Root Cause | Solution |
-| :--- | :--- | :--- |
-| **DatasetValidationError: Missing split directories** | Dataset folder is missing or incorrectly named. | Ensure `dataset/Training` and `dataset/Testing` exist, or place dataset inside `dataset/Brain Tumor MRI Dataset/`. |
-| **Missing class folder or 0 images found** | One of the 4 class folders is missing or empty. | Ensure all 4 classes (`glioma`, `meningioma`, `notumor`, `pituitary`) exist in both `Training` and `Testing` with valid JPG/PNG files. |
-| **Wrong Jupyter Kernel** | Notebook running on global Python without dependencies. | In VS Code or Jupyter, select the kernel named `Brain Tumor DenseNet` (pointing to `.venv`). |
-| **No module named 'src'** | Notebook launched from unexpected working directory. | Cell 1 dynamically resolves `PROJECT_ROOT` and inserts it into `sys.path`. Verify you run Cell 1 first. |
-| **ImageNet weights failed to download** | Network connection blocked or offline during first run. | DenseNet121 downloads weights (~29MB) from Keras storage once. Ensure an active internet connection on first run. |
-| **ResourceExhaustedError / Out of Memory (OOM)** | GPU/CPU RAM exceeded with default batch size. | Reduce batch size from `16` to `8` in `src/config.py` or use `--batch-size 8`. |
-| **No trained model found** | Attempting evaluation or prediction before training. | Train the model first via `python -m src.train` or set `RUN_TRAINING = True` in the notebook. |
-| **Corrupted MRI image detected** | An image file is truncated or unreadable. | The EDA script and data loader automatically report corrupt files. Delete or replace the reported files. |
-
----
-
-## Unit Tests
-
-The test suite validates dataset discovery, class normalization, preprocessing, and prediction contracts without requiring the large dataset or a full trained model:
+## Predict from the command line
 
 ```bash
-pytest -v
+python -m src.predict path/to/mri.jpg
 ```
-
-All 19 tests pass in ~10 seconds.
 
 ---
 
-## Project Structure
+# 📓 Jupyter Notebook Workflow
+
+The project contains:
+
+```text
+notebooks/Brain_Tumor_DenseNet.ipynb
+```
+
+The notebook follows a structured **29-step academic workflow** covering:
+
+1. Problem statement
+2. Medical disclaimer
+3. Environment diagnostics
+4. Project-root discovery
+5. Dataset discovery
+6. Dataset validation
+7. Exploratory data analysis
+8. Class distribution
+9. Sample MRI visualization
+10. Image preprocessing
+11. Data augmentation
+12. TensorFlow dataset creation
+13. DenseNet121 construction
+14. Architecture explanation
+15. Stage-1 setup
+16. Feature-extraction training
+17. Stage-1 curves
+18. Fine-tuning setup
+19. Fine-tuning
+20. Final model selection
+21. Held-out test evaluation
+22. Accuracy / precision / recall / F1
+23. Classification report
+24. Confusion matrix
+25. ROC-AUC analysis
+26. Single-image prediction
+27. Probability visualization
+28. Grad-CAM
+29. Conclusions and viva preparation
+
+Training can be controlled through notebook flags such as:
+
+```python
+RUN_TRAINING = False
+QUICK_TEST = False
+```
+
+---
+
+# 📂 Project Structure
 
 ```text
 Brain-Tumor-Detection-DenseNet/
+│
+├── .streamlit/
+│   └── config.toml
+│
 ├── app/
+│   ├── assets/
+│   │   └── logo.png
 │   ├── __init__.py
-│   ├── app.py                     # Interactive Streamlit dashboard
-│   ├── predictor.py               # Streamlit-facing prediction adapter
-│   ├── gradcam.py                 # Grad-CAM heatmap and overlay generator
-│   └── utils.py                   # Report generator and JSON reader
+│   ├── app.py
+│   ├── predictor.py
+│   ├── gradcam.py
+│   └── utils.py
+│
 ├── src/
 │   ├── __init__.py
-│   ├── config.py                  # Project paths and hyperparameters
-│   ├── dataset_utils.py           # Robust dataset resolver & validator
-│   ├── data_loader.py             # tf.data train/val/test pipeline
-│   ├── preprocessing.py           # RGB conversion, resize, DenseNet scaling
-│   ├── eda.py                     # Real exploratory data analysis
-│   ├── model.py                   # DenseNet121 construction & fine-tuning
-│   ├── train.py                   # Two-stage training pipeline (CLI)
-│   ├── evaluate.py                # Test set evaluation & metrics (CLI)
-│   └── predict.py                 # Single MRI inference utility (CLI)
+│   ├── config.py
+│   ├── dataset_utils.py
+│   ├── data_loader.py
+│   ├── preprocessing.py
+│   ├── eda.py
+│   ├── model.py
+│   ├── train.py
+│   ├── evaluate.py
+│   └── predict.py
+│
 ├── notebooks/
-│   └── Brain_Tumor_DenseNet.ipynb # Complete 29-step academic notebook
+│   └── Brain_Tumor_DenseNet.ipynb
+│
 ├── dataset/
-│   ├── README.md                  # Dataset source and setup documentation
-│   ├── Training/                  # (Ignored by Git)
-│   └── Testing/                   # (Ignored by Git)
-├── models/                        # Saved .keras models (Ignored by Git)
-├── results/                       # Generated evaluation JSONs & plots
-├── sample_images/                 # Real sample images for quick testing
+│   └── README.md
+│
+├── models/
+│   └── best_densenet121.keras
+│
+├── results/
+│   └── plots/
+│
+├── sample_images/
+│
 ├── tests/
-│   ├── test_dataset_utils.py      # Tests for discovery, aliases, validation
-│   ├── test_prediction.py         # Tests for prediction contract
-│   ├── test_preprocessing.py      # Tests for preprocessing pipeline
-│   └── test_project_structure.py  # Tests for repository contract
+│   ├── test_dataset_utils.py
+│   ├── test_prediction.py
+│   ├── test_preprocessing.py
+│   └── test_project_structure.py
+│
 ├── .gitignore
-├── pytest.ini
-├── requirements.txt
-├── README.md
 ├── LICENSE
+├── pytest.ini
+├── README.md
+├── requirements.txt
 └── run_app.py
 ```
 
 ---
 
-## Viva Voce Q&A Preparation
+# 🧪 Testing
 
-- **Why DenseNet121 instead of VGG or ResNet?**  
-  DenseNet connects each layer to every other layer ($x_l = H_l([x_0, \dots, x_{l-1}])$). This enables maximum feature reuse, mitigates vanishing gradients, and achieves higher parameter efficiency (~7M vs ~25M for ResNet50 and ~138M for VGG16).
-- **Why use two training stages?**  
-  Randomly initialized dense classification head weights produce large gradient updates initially. Freezing the backbone in Stage 1 protects pretrained ImageNet weights. In Stage 2, upper layers are unfrozen with a 100× lower learning rate.
-- **Why keep BatchNormalization layers frozen during fine-tuning?**  
-  Updating batch statistics on small medical batches degrades pretrained representation quality.
-- **What does Grad-CAM compute?**  
-  It pools gradients of the target class score with respect to feature maps of the final convolutional layer to visualize model attention.
-- **How is data leakage prevented?**  
-  The held-out `Testing/` split is never used for training or validation. The `Training/` directory is partitioned into 80% train and 20% validation, and augmentation is applied exclusively to training data.
+Run the project test suite using:
+
+```bash
+pytest -v
+```
+
+Tests cover important functionality including:
+
+- project structure,
+- dataset discovery,
+- class alias normalization,
+- preprocessing contracts,
+- prediction behavior.
 
 ---
 
-## License
+# ☁️ Deployment
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+The application is deployed using **Streamlit Community Cloud**.
+
+### Production Configuration
+
+```text
+Python: 3.12
+TensorFlow: 2.20.0
+Entrypoint: app/app.py
+Model: models/best_densenet121.keras
+```
+
+### Live Deployment
+
+🔗 **https://brain-tumor-detection-ai-158.streamlit.app/**
+
+Updates pushed to the connected GitHub branch can be reflected in the deployed application through Streamlit's deployment workflow.
+
+---
+
+# ⚠️ Limitations
+
+This project has several important limitations:
+
+- It is trained on a specific public MRI dataset.
+- Dataset performance does not automatically represent real hospital performance.
+- MRI acquisition conditions may differ across scanners and institutions.
+- Softmax confidence is not equivalent to medical certainty.
+- Grad-CAM represents model attention, not tumor segmentation.
+- The model has not undergone clinical validation.
+- The application must not be used for patient diagnosis or treatment decisions.
+
+---
+
+# 🔮 Future Improvements
+
+Possible future extensions include:
+
+- external-dataset validation,
+- stronger duplicate/leakage analysis,
+- probability calibration,
+- tumor segmentation,
+- uncertainty estimation,
+- model comparison with EfficientNet / ConvNeXt / Vision Transformers,
+- richer explainability techniques,
+- DICOM support,
+- experiment tracking,
+- Docker deployment,
+- API-based inference,
+- automated model monitoring.
+
+---
+
+# 🎓 Academic Value
+
+This repository demonstrates practical understanding of:
+
+```text
+Deep Learning
+Computer Vision
+Transfer Learning
+CNN Architectures
+Medical Image Classification
+TensorFlow / Keras
+Data Pipelines
+Model Evaluation
+Explainable AI
+Grad-CAM
+Streamlit
+Software Engineering
+Git / GitHub
+Cloud Deployment
+```
+
+It is designed not simply as a notebook experiment, but as a complete AI project with:
+
+**data → training → evaluation → explainability → interface → deployment**
+
+---
+
+# 👩‍💻 Author
+
+<div align="center">
+
+### Archi Sharma
+
+**B.Tech Computer Science & Engineering — Artificial Intelligence & Machine Learning**
+
+[![GitHub](https://img.shields.io/badge/GitHub-archisharma158--cmd-181717?style=for-the-badge&logo=github)](https://github.com/archisharma158-cmd)
+
+<br>
+
+*Building practical AI systems while learning the concepts behind them.*
+
+</div>
+
+---
+
+# 🤝 Contributing
+
+Suggestions, improvements, and constructive feedback are welcome.
+
+To contribute:
+
+```bash
+git checkout -b feature/your-feature
+git commit -m "Add your feature"
+git push origin feature/your-feature
+```
+
+Then open a pull request describing the proposed changes.
+
+---
+
+# ⭐ Support
+
+If you found this project useful or interesting, consider giving the repository a **⭐ star**.
+
+It helps others discover the project and supports continued development.
+
+---
+
+# 📜 License
+
+This project is distributed under the **MIT License**.
+
+See [`LICENSE`](LICENSE) for details.
+
+---
+
+<div align="center">
+
+### 🧠 AI for learning • 🔬 Explainability for understanding • 🚀 Deployment for accessibility
+
+<br>
+
+**Developed by Archi Sharma**
+
+</div>
