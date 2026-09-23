@@ -1,6 +1,7 @@
 """Polished Streamlit interface for Brain Tumor Detection using DenseNet121."""
 from __future__ import annotations
 
+import base64
 from datetime import datetime
 from pathlib import Path
 import sys
@@ -14,6 +15,7 @@ sys.path.insert(0, ROOT_STR)
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from PIL import Image
 
 from app.gradcam import create_heatmap_images
 from app.predictor import analyze_mri, load_model
@@ -29,10 +31,20 @@ from src.config import (
 )
 from src.preprocessing import load_rgb_image
 
+# Load logo for page favicon and inline usage
+_LOGO_PATH = Path(__file__).resolve().parent / "assets" / "logo.png"
+_LOGO_IMAGE = Image.open(_LOGO_PATH) if _LOGO_PATH.is_file() else None
+_LOGO_B64 = base64.b64encode(_LOGO_PATH.read_bytes()).decode() if _LOGO_PATH.is_file() else ""
+_LOGO_DATA_URL = f"data:image/png;base64,{_LOGO_B64}" if _LOGO_B64 else ""
+
+# Load wallpaper for app background
+_WALLPAPER_PATH = Path(__file__).resolve().parent / "assets" / "wallpaper.png"
+_WP_B64 = base64.b64encode(_WALLPAPER_PATH.read_bytes()).decode() if _WALLPAPER_PATH.is_file() else ""
+_WP_DATA_URL = f"data:image/png;base64,{_WP_B64}" if _WP_B64 else ""
 
 st.set_page_config(
     page_title="Brain MRI AI | DenseNet121",
-    page_icon="🧠",
+    page_icon=_LOGO_IMAGE or "🧠",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -67,66 +79,25 @@ st.markdown(
     }
 
     .stApp {
-        background-color: #F8FAFD;
-        background-image:
-            /* Layer 1: Ambient Clinical Pink Glow (Top Right) */
-            radial-gradient(ellipse 950px 750px at 94% 0%, rgba(236, 72, 153, 0.055) 0%, rgba(244, 114, 182, 0.015) 50%, transparent 75%),
-            /* Layer 2: Deep Clinical Navy Glow (Lower Left) */
-            radial-gradient(ellipse 950px 750px at 8% 100%, rgba(10, 31, 54, 0.045) 0%, rgba(16, 50, 83, 0.015) 50%, transparent 75%),
-            /* Layer 3: Faint Upper-Left Navy Focus */
-            radial-gradient(ellipse 800px 600px at 6% 14%, rgba(16, 50, 83, 0.035) 0%, transparent 65%),
-            /* Layer 4: Faint Mid-Right Pink Accent */
-            radial-gradient(ellipse 800px 600px at 92% 64%, rgba(219, 39, 119, 0.025) 0%, transparent 60%),
-            /* Layer 5: Topographic MRI Contours & Neural Network Nodes */
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500' fill='none'%3E%3Cpath d='M80 260 C120 180, 240 140, 380 180 C480 210, 560 160, 680 190 C740 205, 780 240, 800 250' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.035' stroke-dasharray='4 4' fill='none'/%3E%3Cpath d='M0 320 C140 280, 260 360, 420 310 C540 270, 640 330, 800 290' stroke='%23103253' stroke-width='1.2' stroke-opacity='0.03' fill='none'/%3E%3Cpath d='M40 120 C180 80, 320 160, 480 110 C600 70, 700 130, 800 100' stroke='%23EC4899' stroke-width='1' stroke-opacity='0.035' fill='none'/%3E%3Cpath d='M0 420 C160 380, 300 460, 460 410 C620 360, 720 430, 800 400' stroke='%23EC4899' stroke-width='0.9' stroke-opacity='0.025' stroke-dasharray='3 3' fill='none'/%3E%3Cline x1='180' y1='80' x2='320' y2='160' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='320' y1='160' x2='480' y2='110' stroke='%23EC4899' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='480' y1='110' x2='600' y2='70' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.03'/%3E%3Cline x1='240' y1='140' x2='380' y2='180' stroke='%23103253' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Cline x1='380' y1='180' x2='420' y2='310' stroke='%23EC4899' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Ccircle cx='180' cy='80' r='2.5' fill='%23103253' fill-opacity='0.045'/%3E%3Ccircle cx='320' cy='160' r='2.5' fill='%23EC4899' fill-opacity='0.05'/%3E%3Ccircle cx='480' cy='110' r='3' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='600' cy='70' r='2' fill='%23EC4899' fill-opacity='0.04'/%3E%3Ccircle cx='380' cy='180' r='3' fill='%23103253' fill-opacity='0.05'/%3E%3Ccircle cx='420' cy='310' r='2.5' fill='%23EC4899' fill-opacity='0.045'/%3E%3Ccircle cx='540' cy='270' r='2' fill='%23103253' fill-opacity='0.04'/%3E%3C/svg%3E"),
-            /* Layer 6: Microscopic Diagnostic Dot Pattern (Precision Sensor Raster) */
-            radial-gradient(circle, rgba(16, 50, 83, 0.04) 1px, transparent 1px),
-            /* Layer 7: Subtle Diagnostic Scan Grid (Telemetry Lines) */
-            linear-gradient(to right, rgba(16, 50, 83, 0.018) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(16, 50, 83, 0.018) 1px, transparent 1px),
-            /* Layer 8: Base Clinical Canvas (Pale Blue-White Gradient) */
-            linear-gradient(180deg, #F8FAFD 0%, #F4F7FB 40%, #EDF3F9 100%);
-        background-size:
-            auto,
-            auto,
-            auto,
-            auto,
-            800px 500px,
-            32px 32px,
-            64px 64px,
-            64px 64px,
-            100% 100%;
-        background-position:
-            center top,
-            center top,
-            center top,
-            center top,
-            0 0,
-            0 0,
-            0 0,
-            0 0,
-            0 0;
-        background-repeat:
-            no-repeat,
-            no-repeat,
-            no-repeat,
-            no-repeat,
-            repeat,
-            repeat,
-            repeat,
-            repeat,
-            no-repeat;
+        background-color: #EEF8FF;
+        background-image: url("__WALLPAPER_URL__");
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
         background-attachment: fixed;
         color: var(--ink);
     }
-
     [data-testid="stAppViewContainer"] {
         background: transparent !important;
     }
 
-    /* Hide default Streamlit top header toolbar, decoration line, and menu */
+    /* Hide default Streamlit top header menu, deploy button, status widget, and decoration line */
     [data-testid="stDecoration"],
-    [data-testid="stToolbar"],
+    [data-testid="stToolbarActions"],
+    [data-testid="stAppDeployButton"],
+    [data-testid="stMainMenu"],
+    [data-testid="stStatusWidget"],
+    [data-testid="stToolbarActionButton"],
     #MainMenu,
     header::before {
         display: none !important;
@@ -136,7 +107,7 @@ st.markdown(
         opacity: 0 !important;
     }
 
-    /* Make the top header area completely transparent and zero height */
+    /* Make the top header and toolbar areas completely transparent, zero height, and non-blocking */
     [data-testid="stHeader"] {
         background: transparent !important;
         border-bottom: none !important;
@@ -148,6 +119,20 @@ st.markdown(
         margin: 0 !important;
         backdrop-filter: none !important;
         z-index: 999990 !important;
+        overflow: visible !important;
+        pointer-events: none !important;
+    }
+
+    [data-testid="stToolbar"] {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: 0px !important;
+        min-height: 0px !important;
+        max-height: 0px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
         pointer-events: none !important;
     }
 
@@ -286,59 +271,121 @@ st.markdown(
         font-weight: 750 !important;
     }
 
-    /* Custom pink sidebar navigation icon (collapsed control trigger) */
+    /* Custom pink sidebar navigation icon (floating expand trigger) */
+    [data-testid="stExpandSidebarButton"],
     [data-testid="stSidebarCollapsedControl"],
     [data-testid="collapsedControl"] {
         position: fixed !important;
         top: 14px !important;
         left: 14px !important;
         z-index: 999999 !important;
-        display: block !important;
+        display: flex !important;
         visibility: visible !important;
         opacity: 1 !important;
         pointer-events: auto !important;
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        min-height: 46px !important;
+        max-width: 46px !important;
+        max-height: 46px !important;
+        border-radius: 13px !important;
+        background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
+        border: 1px solid rgba(255, 255, 255, 0.75) !important;
+        box-shadow: 0 10px 26px rgba(219, 39, 119, 0.35) !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        outline: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
     }
 
+    [data-testid="stExpandSidebarButton"]:hover,
+    [data-testid="stSidebarCollapsedControl"]:hover,
+    [data-testid="collapsedControl"]:hover,
+    [data-testid="stSidebarCollapsedControl"] button:hover,
+    [data-testid="collapsedControl"] button:hover {
+        transform: translateY(-1px) scale(1.05) !important;
+        box-shadow: 0 14px 32px rgba(219, 39, 119, 0.45) !important;
+        background: linear-gradient(135deg, #EC4899, #DB2777) !important;
+    }
+
+    [data-testid="stExpandSidebarButton"]:active,
+    [data-testid="stSidebarCollapsedControl"]:active,
+    [data-testid="collapsedControl"]:active,
+    [data-testid="stSidebarCollapsedControl"] button:active,
+    [data-testid="collapsedControl"] button:active {
+        transform: scale(0.94) !important;
+        box-shadow: 0 6px 16px rgba(219, 39, 119, 0.28) !important;
+    }
+
+    /* Target inner button if nested within a container */
     [data-testid="stSidebarCollapsedControl"] button,
     [data-testid="collapsedControl"] button {
         width: 46px !important;
         height: 46px !important;
         border-radius: 13px !important;
-        background: linear-gradient(135deg, var(--pink-500), var(--pink-600)) !important;
-        border: 1px solid rgba(255, 255, 255, 0.75) !important;
-        box-shadow: 0 10px 26px rgba(219, 39, 119, 0.32) !important;
+        background: transparent !important;
+        border: none !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         cursor: pointer !important;
         pointer-events: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    [data-testid="stSidebarCollapsedControl"] button:hover,
-    [data-testid="collapsedControl"] button:hover {
-        transform: translateY(-1px) scale(1.02);
-        box-shadow: 0 14px 32px rgba(219, 39, 119, 0.42) !important;
+    /* All icons and text inside the expand button must be crisp white and non-blocking */
+    [data-testid="stExpandSidebarButton"] *,
+    [data-testid="stSidebarCollapsedControl"] *,
+    [data-testid="collapsedControl"] * {
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
+        pointer-events: none !important;
     }
 
+    [data-testid="stExpandSidebarButton"] span,
+    [data-testid="stSidebarCollapsedControl"] span,
+    [data-testid="collapsedControl"] span {
+        font-size: 24px !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    [data-testid="stExpandSidebarButton"] svg,
     [data-testid="stSidebarCollapsedControl"] svg,
     [data-testid="collapsedControl"] svg {
         display: block !important;
         visibility: visible !important;
         width: 22px !important;
         height: 22px !important;
-        color: white !important;
-        fill: white !important;
+        color: #FFFFFF !important;
+        fill: #FFFFFF !important;
+        pointer-events: none !important;
     }
 
     [data-testid="stSidebarCollapseButton"] button {
         border-radius: 10px !important;
         background: rgba(255,255,255,.08) !important;
+        transition: background 0.2s ease !important;
+    }
+
+    [data-testid="stSidebarCollapseButton"] button:hover {
+        background: rgba(255,255,255,.18) !important;
     }
 
     /* Reusable cards */
     .clinical-card {
-        background: rgba(255,255,255,.97);
-        border: 1px solid var(--line);
+        background: rgba(255,255,255,.72);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255,255,255,.45);
         border-radius: 20px;
         box-shadow: 0 14px 36px rgba(6,20,38,.07);
         padding: 1.35rem 1.4rem;
@@ -350,8 +397,10 @@ st.markdown(
     }
 
     .section-intro {
-        background: #FFFFFF;
-        border: 1px solid var(--line);
+        background: rgba(255,255,255,.68);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.40);
         border-left: 5px solid var(--pink-500);
         border-radius: 14px;
         padding: 1rem 1.15rem;
@@ -361,8 +410,10 @@ st.markdown(
     }
 
     .important-note {
-        background: linear-gradient(135deg, var(--pink-50), #FFFFFF);
-        border: 1px solid #F8C9DF;
+        background: linear-gradient(135deg, rgba(253,242,248,.55), rgba(255,255,255,.60));
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(248,201,223,.50);
         border-radius: 15px;
         padding: 1rem 1.1rem;
         color: var(--navy-900);
@@ -370,8 +421,10 @@ st.markdown(
     }
 
     .medical-disclaimer {
-        background: #FFF8FB;
-        border: 1px solid #F6C6DC;
+        background: rgba(255,248,251,.65);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(246,198,220,.45);
         border-left: 5px solid var(--pink-500);
         border-radius: 14px;
         padding: 1rem 1.15rem;
@@ -461,11 +514,13 @@ st.markdown(
     }
 
     .scan-panel {
-        background: rgba(255,255,255,.96);
+        background: rgba(255,255,255,.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border-radius: 24px;
         padding: 1.4rem;
         box-shadow: 0 20px 50px rgba(0,0,0,.18);
-        border: 1px solid rgba(255,255,255,.7);
+        border: 1px solid rgba(255,255,255,.45);
     }
 
     .scan-frame {
@@ -572,8 +627,10 @@ st.markdown(
 
     /* Streamlit widgets */
     div[data-testid="stMetric"] {
-        background: #FFFFFF;
-        border: 1px solid var(--line);
+        background: rgba(255,255,255,.68);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.40);
         border-radius: 18px;
         padding: 1rem 1.05rem;
         box-shadow: 0 10px 28px rgba(6,20,38,.055);
@@ -608,7 +665,9 @@ st.markdown(
     }
 
     [data-testid="stFileUploader"] section {
-        background: #FFFFFF;
+        background: rgba(255,255,255,.65);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         border: 1.5px dashed #F19CC5;
         border-radius: 18px;
         padding: .7rem;
@@ -625,10 +684,12 @@ st.markdown(
     }
 
     [data-testid="stDataFrame"] {
-        border: 1px solid var(--line);
+        border: 1px solid rgba(255,255,255,.40);
         border-radius: 16px;
         overflow: hidden;
-        background: white;
+        background: rgba(255,255,255,.68);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
     }
 
     .stImage img {
@@ -926,7 +987,7 @@ div[data-testid="stMetric"]:hover {
         .scan-panel { margin-top: .4rem; }
     }
     </style>
-    """,
+    """.replace("__WALLPAPER_URL__", _WP_DATA_URL),
     unsafe_allow_html=True,
 )
 
@@ -1025,7 +1086,7 @@ def render_home() -> None:
                     </div>
                 </div>
                 <div class="scan-panel">
-                    <div class="scan-frame"><div class="brain-glyph">🧠</div></div>
+                    <div class="scan-frame"><img src="{_LOGO_DATA_URL}" alt="Brain Tumor Detection Logo" style="width:120px;height:120px;z-index:2;filter:drop-shadow(0 10px 16px rgba(16,50,83,.14));" /></div>
                     <div class="scan-status"><span>DenseNet121 inference engine</span><span>● {model_status}</span></div>
                 </div>
             </div>
@@ -1444,9 +1505,9 @@ if "nav_page" not in st.session_state:
     st.session_state["nav_page"] = "Home"
 
 st.sidebar.markdown(
-    """
+    f"""
     <div style="padding:.45rem .2rem 1.1rem;">
-        <div style="width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#EC4899,#DB2777);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:.7rem;">🧠</div>
+        <img src="{_LOGO_DATA_URL}" alt="Logo" style="width:46px;height:46px;border-radius:13px;margin-bottom:.7rem;object-fit:contain;" />
         <div style="font-size:1.12rem;font-weight:850;line-height:1.15;">Brain MRI AI</div>
         <div style="font-size:.78rem;color:#B9CCDC;margin-top:.25rem;">DenseNet121 Research Workspace</div>
     </div>
