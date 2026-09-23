@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="app/assets/logo.png" alt="Brain Tumor Detection Logo" width="180" />
+</p>
+
 # Brain Tumor Detection using DenseNet121
 
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)
